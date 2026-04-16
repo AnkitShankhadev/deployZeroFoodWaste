@@ -67,90 +67,88 @@ const Auth = () => {
   }, [searchParams]);
 
   const getLocation = () => {
-    console.log("🔍 getLocation called");
-    console.log("🌐 Protocol:", window.location.protocol);
-    console.log("🗺️ Navigator geolocation available:", !!navigator.geolocation);
-    
     setIsGettingLocation(true);
-  
+
     if (!navigator.geolocation) {
-      console.error("❌ Geolocation not supported");
       toast({
         title: "Geolocation not supported",
-        description: "Please enter your address manually",
+        description: "Please enter your address manually below.",
         variant: "destructive",
       });
       setIsGettingLocation(false);
       return;
     }
 
-    console.log("📍 Requesting current position...");
-  
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        console.log("✅ Success! Position received:", position);
-        console.log("📌 Latitude:", position.coords.latitude);
-        console.log("📌 Longitude:", position.coords.longitude);
-        console.log("📏 Accuracy:", position.coords.accuracy, "meters");
-        
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // Update lat/lng immediately so the GPS box shows
         setFormData((prev) => ({
           ...prev,
           location: {
             ...prev.location,
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+            lat: latitude,
+            lng: longitude,
           },
         }));
-  
-        toast({
-          title: "Location detected",
-          description: `Lat: ${position.coords.latitude.toFixed(4)}, Lng: ${position.coords.longitude.toFixed(4)}`,
-        });
-  
+
+        // Reverse-geocode with Nominatim to fill in a readable address
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          );
+          const data = await res.json();
+          const readableAddress = data.display_name ?? `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+
+          setFormData((prev) => ({
+            ...prev,
+            location: {
+              lat: latitude,
+              lng: longitude,
+              address: readableAddress,
+            },
+          }));
+
+          toast({
+            title: "Location detected ✅",
+            description: readableAddress.slice(0, 80),
+          });
+        } catch {
+          // Nominatim failed but we still have coordinates
+          toast({
+            title: "Location detected ✅",
+            description: `${latitude.toFixed(4)}, ${longitude.toFixed(4)} — enter address name below if needed.`,
+          });
+        }
+
         setIsGettingLocation(false);
       },
       (error) => {
-        console.error("❌ Geolocation error:", error);
-        console.error("Error code:", error.code);
-        console.error("Error message:", error.message);
-        
-        let errorMessage = "Could not get your location. Please enter manually.";
         let errorTitle = "Location error";
-        
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorTitle = "Permission Denied";
-            errorMessage = "You denied location access. Please enable it in your browser settings or enter address manually.";
-            console.error("🚫 User denied location permission");
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorTitle = "Position Unavailable";
-            errorMessage = "Location information unavailable. Check GPS settings or enter address manually.";
-            console.error("📍 Position unavailable");
-            break;
-          case error.TIMEOUT:
-            errorTitle = "Request Timeout";
-            errorMessage = "Location request timed out. Weak GPS signal. Please try again or enter manually.";
-            console.error("⏱️ Geolocation request timed out");
-            break;
+        let errorMessage = "Could not get your location. Please enter your address manually.";
+
+        if (error.code === error.PERMISSION_DENIED) {
+          errorTitle = "Permission Denied";
+          errorMessage =
+            "Location access was denied. Enable it in your browser's site settings, or type your address below.";
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorTitle = "Position Unavailable";
+          errorMessage = "Your device could not determine your location. Please enter it manually.";
+        } else if (error.code === error.TIMEOUT) {
+          errorTitle = "Timed Out";
+          errorMessage = "The location request timed out. Check your GPS/network and try again.";
         }
-  
-        toast({
-          title: errorTitle,
-          description: errorMessage,
-          variant: "destructive",
-        });
-  
+
+        toast({ title: errorTitle, description: errorMessage, variant: "destructive" });
         setIsGettingLocation(false);
       },
       {
-        enableHighAccuracy: false,
-        timeout: 30000,
-        maximumAge: 300000,
+        enableHighAccuracy: false, // faster, uses network/WiFi
+        timeout: 10000,            // 10 s — don't make the user wait 30 s
+        maximumAge: 60000,         // accept cached position up to 1 min old
       }
     );
-    
-    console.log("⏳ Waiting for geolocation response...");
   };
   
 
