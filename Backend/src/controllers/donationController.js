@@ -413,6 +413,45 @@ exports.deleteDonation = async (req, res, next) => {
   }
 };
 /**
+ * @desc    Get all donation locations for the map (public)
+ * @route   GET /api/donations/locations
+ * @access  Public
+ */
+exports.getDonationLocations = async (req, res, next) => {
+  try {
+    const donations = await FoodDonation.find({
+      status: { $in: ["CREATED", "ACCEPTED", "ASSIGNED"] },
+      "location.lat": { $exists: true },
+      "location.lng": { $exists: true },
+    })
+      .select("foodType quantity quantityUnit expiryDate description status location donorId")
+      .populate("donorId", "name")
+      .lean();
+
+    const locations = donations.map((d) => ({
+      id: d._id,
+      foodType: d.foodType,
+      quantity: d.quantity,
+      quantityUnit: d.quantityUnit,
+      expiryDate: d.expiryDate,
+      description: d.description,
+      status: d.status,
+      latitude: d.location.lat,
+      longitude: d.location.lng,
+      address: d.location.address,
+      donor: d.donorId ? { name: d.donorId.name } : null,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: { locations, total: locations.length },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Clean up expired donations (mark as EXPIRED)
  * @route   POST /api/donations/cleanup/expired
  * @access  Private/Admin

@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { api } from "@/lib/api";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
+const getAuthToken = (): string | null => localStorage.getItem("token");
 
 export interface MapMarker {
   id: string;
@@ -14,9 +18,27 @@ export interface MapMarker {
   foodType?: string;
   organizationName?: string;
   description?: string;
-  donor?: {
-    name: string;
-  };
+  donor?: { name: string };
+}
+
+async function fetchPublic<T>(endpoint: string): Promise<T> {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function fetchAuthed<T>(endpoint: string): Promise<T | null> {
+  const token = getAuthToken();
+  if (!token) return null;
+  try {
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
 export function useMapData() {
@@ -27,115 +49,114 @@ export function useMapData() {
   const fetchData = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      console.log("🌍 Fetching map data from backend...");
-
-      // Fetch all data in parallel
-      const [donationsResponse, ngosResponse, volunteersResponse] = await Promise.allSettled([
-        api.getDonations({ status: "CREATED" }),
-        api.getUsers({ role: "NGO" }),
-        api.getUsers({ role: "VOLUNTEER" }),
-      ]);
-
       const allMarkers: MapMarker[] = [];
 
-      // Process donations
-      if (donationsResponse.status === "fulfilled" && donationsResponse.value.success) {
-        const donations = donationsResponse.value.data?.donations || [];
-        console.log(`📦 Loaded ${donations.length} donations`);
-        
-        donations.forEach((d: any) => {
-          // Check for location data in multiple formats
-          const lat = d.location?.lat || d.location?.latitude || d.latitude;
-          const lng = d.location?.lng || d.location?.longitude || d.longitude;
-          
-          if (lat && lng) {
-            allMarkers.push({
-              id: d._id || d.id,
-              type: "donation",
-              title: d.title || d.foodType || "Food Donation",
-              latitude: parseFloat(lat),
-              longitude: parseFloat(lng),
-              status: d.status,
-              quantity: d.quantity,
-              quantityUnit: d.quantityUnit,
-              expiryDate: d.expiryDate,
-              foodType: d.foodType,
-              description: d.description,
-              donor: d.donor,
-            });
+      // ── 1. DONATIONS via the new public endpoint ──────────────────────────
+      try {
+        const donationRes = await fetchPublic<{
+          success: boolean;
+          data: { locations: any[] };
+        }>("/donations/locations");
+
+        if (donationRes.success) {
+          for (const d of donationRes.data.locations ?? []) {
+            const lat = Number(d.latitude);
+            const lng = Number(d.longitude);
+            if (!isNaN(lat) && !isNaN(lng)) {
+              allMarkers.push({
+                id: String(d.id || d._id),
+                type: "donation",
+                title: d.foodType || "Food Donation",
+                latitude: lat,
+                longitude: lng,
+                status: d.status,
+                quantity: d.quantity,
+                quantityUnit: d.quantityUnit,
+                expiryDate: d.expiryDate,
+                foodType: d.foodType,
+                description: d.description,
+                donor: d.donor,
+              });
+            }
           }
-        });
-      } else {
-        console.warn("⚠️ Failed to load donations:", donationsResponse);
+          console.log(`📦 Loaded ${allMarkers.length} donations`);
+        }
+      } catch (e) {
+        console.warn("⚠️ Could not load donations:", e);
       }
 
-      // Process NGOs
-      if (ngosResponse.status === "fulfilled" && ngosResponse.value.success) {
-        const ngos = ngosResponse.value.data?.users || [];
-        console.log(`🏢 Loaded ${ngos.length} NGOs`);
-        
-        ngos.forEach((n: any) => {
-          const lat = n.location?.lat || n.location?.latitude || n.latitude;
-          const lng = n.location?.lng || n.location?.longitude || n.longitude;
-          
-          if (lat && lng) {
+      // ── 2. NGOs & Volunteers via authed endpoints (graceful if not logged in) ──
+      const userRes = await fetchAuthed<{
+        success: boolean;
+        data: { users: any[] };
+      }>("/users?role=NGO");
+
+      if (userRes?.success) {
+        for (const n of userRes.data?.users ?? []) {
+          const lat = Number(
+            n.location?.lat ?? n.location?.latitude ?? n.latitude
+          );
+          const lng = Number(
+            n.location?.lng ?? n.location?.longitude ?? n.longitude
+          );
+          if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
             allMarkers.push({
-              id: n._id || n.id,
+              id: String(n._id || n.id),
               type: "ngo",
               title: n.name || "NGO",
-              latitude: parseFloat(lat),
-              longitude: parseFloat(lng),
+              latitude: lat,
+              longitude: lng,
               organizationName: n.name,
               description: n.description,
             });
           }
-        });
-      } else {
-        console.warn("⚠️ Failed to load NGOs:", ngosResponse);
+        }
+        console.log(
+          `🏢 Loaded ${allMarkers.filter((m) => m.type === "ngo").length} NGOs`
+        );
       }
 
-      // Process Volunteers
-      if (volunteersResponse.status === "fulfilled" && volunteersResponse.value.success) {
-        const volunteers = volunteersResponse.value.data?.users || [];
-        console.log(`🚴 Loaded ${volunteers.length} volunteers`);
-        
-        volunteers.forEach((v: any) => {
-          const lat = v.location?.lat || v.location?.latitude || v.latitude;
-          const lng = v.location?.lng || v.location?.longitude || v.longitude;
-          
-          if (lat && lng) {
+      const volRes = await fetchAuthed<{
+        success: boolean;
+        data: { users: any[] };
+      }>("/users?role=VOLUNTEER");
+
+      if (volRes?.success) {
+        for (const v of volRes.data?.users ?? []) {
+          const lat = Number(
+            v.location?.lat ?? v.location?.latitude ?? v.latitude
+          );
+          const lng = Number(
+            v.location?.lng ?? v.location?.longitude ?? v.longitude
+          );
+          if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
             allMarkers.push({
-              id: v._id || v.id,
+              id: String(v._id || v.id),
               type: "volunteer",
               title: v.name || "Volunteer",
-              latitude: parseFloat(lat),
-              longitude: parseFloat(lng),
+              latitude: lat,
+              longitude: lng,
               description: v.description,
             });
           }
-        });
-      } else {
-        console.warn("⚠️ Failed to load volunteers:", volunteersResponse);
+        }
+        console.log(
+          `🚴 Loaded ${allMarkers.filter((m) => m.type === "volunteer").length} volunteers`
+        );
       }
 
-      console.log(`✅ Total markers loaded: ${allMarkers.length}`);
-      
-      // If we have no markers at all, show error
-      if (allMarkers.length === 0) {
-        console.warn("⚠️ No markers with valid coordinates found");
-        setError("No locations found on the map");
-      }
-      
+      console.log(`✅ Total markers: ${allMarkers.length}`);
       setMarkers(allMarkers);
 
-    } catch (error) {
-      console.error("❌ Map data error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to load map data";
-      setError(errorMessage);
-      
-      // Set empty array instead of mock data
+      if (allMarkers.length === 0) {
+        setError("No locations found. Add donations to see them on the map.");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load map data";
+      console.error("❌ Map data error:", err);
+      setError(msg);
       setMarkers([]);
     } finally {
       setIsLoading(false);

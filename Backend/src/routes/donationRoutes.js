@@ -10,6 +10,7 @@ const {
   cancelDonation,
   deleteDonation,
   cleanupExpiredDonations,
+  getDonationLocations,
 } = require("../controllers/donationController");
 const { protect } = require("../middleware/authMiddleware");
 const {
@@ -18,7 +19,10 @@ const {
   authorize,
 } = require("../middleware/roleMiddleware");
 
-router.use(protect); // All routes require authentication
+// Public route (no auth required) - must be BEFORE protect middleware
+router.get("/locations", getDonationLocations);
+
+router.use(protect); // All routes below require authentication
 
 router.post("/cleanup/expired", authorize("ADMIN"), cleanupExpiredDonations);
 router.post("/", donorOnly, createDonation);

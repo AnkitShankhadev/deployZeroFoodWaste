@@ -315,4 +315,74 @@ export const api = {
         levels: Array<any>;
       };
     }>(`/achievements/badges/levels`),
+
+  // Map endpoints - Nearby locations
+  getNearbyNGOs: (params: { lat: number; lng: number; radius?: number }) => {
+    const query = new URLSearchParams();
+    query.append("lat", params.lat.toString());
+    query.append("lng", params.lng.toString());
+    if (params.radius) query.append("radius", params.radius.toString());
+    return apiRequest<{
+      success: boolean;
+      data: { ngos: any[]; count: number };
+    }>(`/matching/nearby-ngos?${query}`);
+  },
+
+  getNearbyVolunteers: (params: {
+    lat: number;
+    lng: number;
+    radius?: number;
+  }) => {
+    const query = new URLSearchParams();
+    query.append("lat", params.lat.toString());
+    query.append("lng", params.lng.toString());
+    if (params.radius) query.append("radius", params.radius.toString());
+    return apiRequest<{
+      success: boolean;
+      data: { volunteers: any[]; count: number };
+    }>(`/matching/nearby-volunteers?${query}`);
+  },
+
+  // Geocoding - Convert address to coordinates (using Nominatim/OpenStreetMap - FREE)
+  geocodeAddress: (address: string) => {
+    return fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.length > 0) {
+          return {
+            success: true,
+            data: {
+              lat: parseFloat(data[0].lat),
+              lng: parseFloat(data[0].lon),
+              address: data[0].display_name,
+            },
+          };
+        }
+        return {
+          success: false,
+          error: "Address not found",
+        };
+      });
+  },
+
+  // Reverse Geocoding - Convert coordinates to address (using Nominatim/OpenStreetMap - FREE)
+  reverseGeocode: (lat: number, lng: number) => {
+    return fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        return {
+          success: true,
+          data: {
+            address:
+              data.address?.road || data.address?.hamlet || data.display_name,
+            fullAddress: data.display_name,
+            components: data.address,
+          },
+        };
+      });
+  },
 };
