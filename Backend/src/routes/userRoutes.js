@@ -6,11 +6,15 @@ const {
   updateUser,
   updateUserStatus,
   deleteUser,
+  getMapPins,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 const { adminOnly, authorize } = require('../middleware/roleMiddleware');
 
-router.use(protect); // All routes require authentication
+// Public route — must be BEFORE protect middleware
+router.get('/map-pins', getMapPins);
+
+router.use(protect); // All routes below require authentication
 
 router.get('/', adminOnly, getAllUsers);
 router.get('/:id', getUser);

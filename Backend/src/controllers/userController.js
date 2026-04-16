@@ -157,3 +157,38 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    Get NGO + Volunteer map pins (public, no auth)
+ * @route   GET /api/users/map-pins
+ * @access  Public
+ */
+exports.getMapPins = async (req, res, next) => {
+  try {
+    const users = await User.find({
+      role: { $in: ['NGO', 'VOLUNTEER'] },
+      status: 'ACTIVE',
+      'location.lat': { $exists: true },
+      'location.lng': { $exists: true },
+    })
+      .select('name role location description')
+      .lean();
+
+    const pins = users.map((u) => ({
+      id: u._id,
+      type: u.role === 'NGO' ? 'ngo' : 'volunteer',
+      title: u.name,
+      latitude: u.location.lat,
+      longitude: u.location.lng,
+      address: u.location.address || null,
+      description: u.description || null,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: { pins, total: pins.length },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

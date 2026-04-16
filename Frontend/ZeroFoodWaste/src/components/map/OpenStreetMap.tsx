@@ -97,6 +97,9 @@ export function OpenStreetMapComponent({
       maxZoom: 19,
     }).addTo(map);
 
+    // Tell Leaflet to recalculate tile coverage after first paint
+    setTimeout(() => map.invalidateSize(), 100);
+
     mapRef.current = map;
 
     return () => {
@@ -205,7 +208,11 @@ export function OpenStreetMapComponent({
   return (
     <div
       id={`map-${uid}`}
-      style={{ height: "100%", width: "100%", minHeight: 400 }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 0,
+      }}
     />
   );
 }
