@@ -37,7 +37,7 @@ interface AuthContextType {
     location?: any,
     phone?: string,
   ) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; user?: any }>;
   signOut: () => Promise<void>;
   updatePassword: (
     currentPassword: string,
