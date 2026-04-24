@@ -11,6 +11,7 @@ const matchingRoutes = require('./routes/matchingRoutes');
 const achievementRoutes = require('./routes/achievementRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use('/api/matching', matchingRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/stats', statsRoutes);
 
 // 404 handler
 app.use(notFound);

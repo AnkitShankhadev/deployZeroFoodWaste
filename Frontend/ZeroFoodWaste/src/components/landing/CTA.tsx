@@ -1,67 +1,75 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Leaf } from "lucide-react";
 
 export const CTA = () => {
   return (
-    <section className="py-24 bg-background relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute top-10 left-10 w-64 h-64 bg-green-200/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-amber-200/20 rounded-full blur-3xl" />
-
+    <section className="py-24 relative overflow-hidden font-sans">
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto"
+          className="max-w-5xl mx-auto"
         >
-          <div className="bg-card rounded-3xl p-8 md:p-12 shadow-xl border border-border relative overflow-hidden">
-            {/* Decorative corner */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-hero opacity-10 rounded-bl-full" />
+          <div className="bg-emerald-900 rounded-[3rem] p-10 md:p-16 lg:p-20 shadow-2xl relative overflow-hidden">
+            {/* Organic decorative background elements */}
+            <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-emerald-800/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+            <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-teal-800/40 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
+            
+            {/* Grid pattern overlay */}
+            <div className="absolute inset-0 opacity-[0.03]" style={{
+              backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+              backgroundSize: '32px 32px'
+            }}></div>
 
-            <div className="relative z-10 text-center">
-              <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", duration: 0.5 }}
-                className="w-20 h-20 mx-auto rounded-2xl bg-gradient-hero flex items-center justify-center mb-6 shadow-glow"
-              >
-                <Sparkles className="w-10 h-10 text-primary-foreground" />
-              </motion.div>
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+              <div className="w-full md:w-3/5 text-center md:text-left">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ type: "spring", duration: 0.6 }}
+                  className="w-16 h-16 rounded-2xl bg-emerald-800/80 backdrop-blur-md flex items-center justify-center mb-8 border border-emerald-700 mx-auto md:mx-0 shadow-lg"
+                >
+                  <Leaf className="w-8 h-8 text-emerald-300" />
+                </motion.div>
 
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Ready to Make a Difference?
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Join thousands of food heroes who are already saving meals and fighting hunger. 
-                Every donation counts, and together we can create a world with zero food waste.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/auth?mode=register&role=donor">
-                  <Button variant="hero" size="xl" className="group w-full sm:w-auto">
-                    Become a Donor
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Link to="/auth?mode=register&role=ngo">
-                  <Button variant="outline" size="xl" className="w-full sm:w-auto">
-                    Register as NGO
-                  </Button>
-                </Link>
-                <Link to="/auth?mode=register&role=volunteer">
-                  <Button variant="soft" size="xl" className="w-full sm:w-auto">
-                    Join as Volunteer
-                  </Button>
-                </Link>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+                  Ready to Make a <span className="text-emerald-300">Difference?</span>
+                </h2>
+                <p className="text-xl text-emerald-100/80 mb-0 max-w-xl mx-auto md:mx-0 font-medium leading-relaxed">
+                  Join thousands of food heroes who are already rescuing meals and fighting hunger. 
+                  Every single donation counts.
+                </p>
               </div>
 
-              <p className="mt-6 text-sm text-muted-foreground">
-                No credit card required • Free forever for donors
-              </p>
+              <div className="w-full md:w-2/5 flex flex-col gap-4">
+                <Link to="/auth?mode=register&role=donor" className="w-full">
+                  <Button size="xl" className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-lg h-16 rounded-full shadow-xl shadow-emerald-900/50 transition-all hover:-translate-y-1 group">
+                    Become a Donor
+                    <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  <Link to="/auth?mode=register&role=ngo" className="w-full">
+                    <Button variant="outline" size="lg" className="w-full border-emerald-700/50 text-emerald-100 hover:bg-emerald-800 hover:text-white rounded-2xl h-14 backdrop-blur-sm bg-black/10">
+                      Register as NGO
+                    </Button>
+                  </Link>
+                  <Link to="/auth?mode=register&role=volunteer" className="w-full">
+                    <Button variant="outline" size="lg" className="w-full border-emerald-700/50 text-emerald-100 hover:bg-emerald-800 hover:text-white rounded-2xl h-14 backdrop-blur-sm bg-black/10">
+                      Be a Volunteer
+                    </Button>
+                  </Link>
+                </div>
+                
+                <p className="mt-4 text-sm text-emerald-300/60 text-center font-medium">
+                  Free forever for all donors & volunteers
+                </p>
+              </div>
             </div>
           </div>
         </motion.div>

@@ -1,24 +1,48 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { api } from "@/lib/api";
+import heroImage from "@/assets/hero_food_donation.png";
 
 export const Hero = () => {
+  const [stats, setStats] = useState({
+    completedDonations: 0,
+    totalDonors: 0,
+    totalNGOs: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.getPlatformStats();
+        if (res.success) {
+          setStats(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch platform stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-16 font-sans">
       {/* Background decorations */}
       <div className="absolute inset-0 bg-gradient-soft" />
-      <div className="absolute top-20 left-10 w-72 h-72 bg-green-200/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl" />
-      
+      <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-200/20 rounded-full blur-3xl" />
+
       {/* Floating shapes */}
       <motion.div
-        className="absolute top-32 right-[20%] w-20 h-20 bg-green-300/40 rounded-2xl rotate-12"
+        className="absolute top-32 right-[20%] w-20 h-20 bg-emerald-300/30 rounded-2xl rotate-12"
         animate={{ y: [0, -20, 0], rotate: [12, 20, 12] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-40 left-[15%] w-16 h-16 bg-amber-300/40 rounded-full"
+        className="absolute bottom-40 left-[15%] w-16 h-16 bg-yellow-300/30 rounded-full"
         animate={{ y: [0, 15, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
@@ -36,38 +60,38 @@ export const Hero = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium mb-6"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-emerald-50 text-emerald-700 text-sm font-medium mb-6 border border-emerald-100"
             >
-              <Sparkles className="w-4 h-4" />
-              Join 10,000+ food heroes
+
             </motion.div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
-              Turn Surplus Into{" "}
-              <span className="text-gradient-primary">Smiles</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-800 leading-tight mb-6 tracking-tight">
+              Real people sharing{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600">
+                good food.
+              </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0">
-              Connect with local NGOs and volunteers to donate excess food before it goes to waste. 
-              Together, we can end hunger and save the planet.
+            <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
+              Got a little extra? We make it incredibly simple to safely share your surplus food
+              with neighbors and local shelters. Let's make sure good food goes to a plate, not a bin.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link to="/auth/register">
-                <Button variant="hero" size="xl" className="group w-full sm:w-auto">
-                  Start Donating
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <Button variant="hero" size="xl" className="group w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-8 shadow-lg shadow-emerald-200">
+                  Share Your Food
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-             
             </div>
 
             {/* Stats */}
-            <div className="mt-12 grid grid-cols-3 gap-6 pt-8 border-t border-border">
+            <div className="mt-12 grid grid-cols-3 gap-6 pt-8 border-t border-slate-100">
               {[
-                { value: "50K+", label: "Meals Saved" },
-                { value: "500+", label: "Active Donors" },
-                { value: "100+", label: "NGO Partners" },
+                { value: stats.completedDonations, label: "Meals Redirected" },
+                { value: stats.totalDonors, label: "Generous Neighbors" },
+                { value: stats.totalNGOs, label: "Local Partners" },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -76,8 +100,10 @@ export const Hero = () => {
                   transition={{ delay: 0.4 + i * 0.1 }}
                   className="text-center lg:text-left"
                 >
-                  <div className="text-2xl md:text-3xl font-bold text-primary">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="text-3xl md:text-4xl font-bold tracking-tight text-emerald-600">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm font-medium text-slate-500 mt-1">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -90,59 +116,17 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="relative hidden lg:block"
           >
-            <div className="relative">
-              {/* Main card */}
-              <div className="bg-card rounded-3xl shadow-xl p-8 border border-border">
-                <div className="aspect-square bg-gradient-soft rounded-2xl flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-hero flex items-center justify-center shadow-glow">
-                      <span className="text-5xl">🍎</span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">Fresh Produce Available</h3>
-                    <p className="text-muted-foreground text-sm mb-4">5kg of vegetables • Expires in 2 days</p>
-                    <div className="flex items-center justify-center gap-2 text-sm text-green-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      3 NGOs nearby
-                    </div>
-                  </div>
-                </div>
+            <div className="relative pl-8">
+              <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-emerald-200/50 border-[8px] border-white z-10 w-full aspect-[4/3] transform transition-transform hover:scale-[1.02] duration-500">
+                <img 
+                  src={heroImage} 
+                  alt="Volunteers sharing food" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-
-              {/* Floating notification */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 }}
-                className="absolute -right-4 top-20 bg-card rounded-xl shadow-lg p-4 border border-border"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <span className="text-lg">✅</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground text-sm">Donation Accepted!</p>
-                    <p className="text-xs text-muted-foreground">FoodBank NGO • 2 min ago</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-                className="absolute -left-4 bottom-20 bg-card rounded-xl shadow-lg p-4 border border-border"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-                    <span className="text-2xl">🏆</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground text-sm">Super Donor</p>
-                    <p className="text-xs text-amber-600">50 donations milestone!</p>
-                  </div>
-                </div>
-              </motion.div>
+              
+              {/* Decorative background element behind image */}
+              <div className="absolute top-8 -right-4 w-full h-full rounded-[2rem] bg-emerald-100/50 z-0 border border-emerald-200/50"></div>
             </div>
           </motion.div>
         </div>

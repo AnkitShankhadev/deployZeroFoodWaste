@@ -128,6 +128,12 @@ export const api = {
       },
     ),
 
+  getPlatformStats: () =>
+    apiRequest<{
+      success: boolean;
+      data: { totalDonors: number; totalNGOs: number; completedDonations: number };
+    }>("/stats"),
+
   getDonations: (params?: {
     status?: string;
     page?: number;

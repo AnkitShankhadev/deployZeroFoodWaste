@@ -1,130 +1,92 @@
 import { motion } from "framer-motion";
-import { 
-  Gift, 
-  MapPin, 
-  Users, 
-  Trophy, 
-  Bell, 
-  BarChart3,
-  ArrowRight
-} from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 const features = [
   {
-    icon: Gift,
-    title: "Easy Donations",
-    description: "List your surplus food in seconds. Add photos, quantities, and expiry dates with our intuitive interface.",
-    color: "bg-green-100 text-green-600",
+    title: "Simple & Fast Donations",
+    description: "List your surplus food in seconds. Add photos, quantities, and specify when it can be picked up. We make it effortless to redirect good food before it goes to waste.",
+    image: "https://images.unsplash.com/photo-1593113565214-06cba6e850bd?auto=format&fit=crop&q=80&w=800",
+    benefits: ["Intuitive photo uploads", "Custom expiry tracking", "Instant notifications"]
   },
   {
-    icon: MapPin,
-    title: "Smart Matching",
-    description: "Our algorithm connects you with nearby NGOs and volunteers for quick, efficient food rescue.",
-    color: "bg-blue-100 text-blue-600",
+    title: "Smart Local Matching",
+    description: "Our platform instantly alerts nearby NGOs and registered volunteers the moment food is available, ensuring it's rescued while it's still fresh and delicious.",
+    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=800",
+    benefits: ["Radius-based alerts", "Optimized routing", "Real-time communication"]
   },
   {
-    icon: Users,
-    title: "Community Network",
-    description: "Join a growing community of donors, NGOs, and volunteers working together to end food waste.",
-    color: "bg-purple-100 text-purple-600",
-  },
-  {
-    icon: Trophy,
-    title: "Earn Rewards",
-    description: "Collect points, unlock badges, and climb the leaderboard as you make a positive impact.",
-    color: "bg-amber-100 text-amber-600",
-  },
-  {
-    icon: Bell,
-    title: "Real-time Updates",
-    description: "Stay informed with instant notifications about donation status, pickups, and achievements.",
-    color: "bg-pink-100 text-pink-600",
-  },
-  {
-    icon: BarChart3,
-    title: "Impact Analytics",
-    description: "Track your contribution with detailed dashboards showing meals saved and environmental impact.",
-    color: "bg-teal-100 text-teal-600",
-  },
+    title: "A Community That Cares",
+    description: "Join thousands of donors, businesses, and volunteers all working together. Earn badges, track your environmental impact, and see exactly how many meals you've saved.",
+    image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80&w=800",
+    benefits: ["Earn rewards & points", "Track CO2 reduction", "Public leaderboards"]
+  }
 ];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 },
-  },
-};
 
 export const Features = () => {
   return (
-    <section className="py-24 bg-background relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-green-50/50 to-transparent" />
-      
+    <section className="py-24 bg-slate-50 relative overflow-hidden font-sans">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-green-100 text-green-700 text-sm font-medium mb-4">
+          <span className="inline-block px-5 py-2 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold mb-4">
             Features
+
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">
             Everything You Need to{" "}
-            <span className="text-primary">Make a Difference</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600">Make an Impact</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A comprehensive platform designed to make food donation simple, 
-            rewarding, and impactful for everyone involved.
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
+            A comprehensive platform designed to make food donation simple,
+            rewarding, and impactful for everyone involved in the community.
           </p>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div className="space-y-24">
           {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              variants={itemVariants}
-              className="group relative bg-card rounded-2xl p-6 border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
-            >
-              <div className={`w-14 h-14 rounded-xl ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
-                <feature.icon className="w-7 h-7" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                {feature.description}
-              </p>
-              <a
-                href="#"
-                className="inline-flex items-center text-sm font-medium text-primary hover:gap-2 transition-all"
+            <div key={feature.title} className={`flex flex-col md:flex-row gap-12 lg:gap-16 items-center ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
+              <motion.div
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="w-full md:w-1/2"
               >
-                Learn more
-                <ArrowRight className="w-4 h-4 ml-1" />
-              </a>
-            </motion.div>
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-emerald-100/50 border-8 border-white group">
+                  <img src={feature.image} alt={feature.title} className="w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="w-full md:w-1/2 space-y-6"
+              >
+                <h3 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">{feature.title}</h3>
+                <p className="text-lg text-slate-600 leading-relaxed font-medium">
+                  {feature.description}
+                </p>
+                <ul className="space-y-4 pt-4">
+                  {feature.benefits.map((benefit) => (
+                    <li key={benefit} className="flex items-center gap-3 text-slate-700 font-semibold text-lg">
+                      <div className="p-1 rounded-full bg-emerald-100">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

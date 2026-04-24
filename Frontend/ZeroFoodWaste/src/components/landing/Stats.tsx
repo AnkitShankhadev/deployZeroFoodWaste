@@ -1,40 +1,56 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Scale, Users, Building2, Leaf } from "lucide-react";
-
-const stats = [
-  { 
-    icon: Scale, 
-    value: "50,000+", 
-    label: "Kg Food Saved", 
-    detail: "From going to waste",
-    iconColor: "text-white"
-  },
-  { 
-    icon: Users, 
-    value: "10,000+", 
-    label: "Active Users", 
-    detail: "Donors & volunteers",
-    iconColor: "text-white"
-  },
-  { 
-    icon: Building2, 
-    value: "250+", 
-    label: "NGO Partners", 
-    detail: "Across the country",
-    iconColor: "text-white"
-  },
-  { 
-    icon: Leaf, 
-    value: "100T", 
-    label: "CO2 Saved", 
-    detail: "Environmental impact",
-    iconColor: "text-white"
-  },
-];
+import { api } from "@/lib/api";
 
 export function Stats() {
+  const [stats, setStats] = useState({
+    completedDonations: 0,
+    totalDonors: 0,
+    totalNGOs: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.getPlatformStats();
+        if (res.success) {
+          setStats(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch platform stats:", error);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const displayStats = [
+    {
+      icon: Scale,
+      value: stats.completedDonations > 0 ? `${(stats.completedDonations * 3).toLocaleString()}kg` : "0",
+      label: "Food Saved",
+      detail: "From going to waste",
+      iconColor: "text-emerald-500"
+    },
+    {
+      icon: Users,
+      value: stats.totalDonors > 0 ? `${stats.totalDonors.toLocaleString()}+` : "0",
+      label: "Active Users",
+      detail: "Donors & volunteers",
+      iconColor: "text-emerald-500"
+    },
+    {
+      icon: Building2,
+      value: stats.totalNGOs > 0 ? `${stats.totalNGOs.toLocaleString()}+` : "0",
+      label: "NGO Partners",
+      detail: "Local partners",
+      iconColor: "text-emerald-500"
+    },
+
+  ];
+
   return (
-    <section className="py-20 bg-[#16A34A] text-white relative overflow-hidden">
+    <section className="py-20 bg-emerald-600 text-white relative overflow-hidden font-sans">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -50,14 +66,14 @@ export function Stats() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Our Impact in Numbers</h2>
-          <p className="text-lg text-white/90 max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-white tracking-tight">Our Impact in Numbers</h2>
+          <p className="text-lg text-emerald-50 max-w-2xl mx-auto font-medium">
             Together, our community is making a real difference in fighting food waste and hunger.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
+          {displayStats.map((stat, index) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -65,15 +81,15 @@ export function Stats() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center shadow-xl shadow-black/5 hover:bg-white/20 transition-colors">
                 <div className="flex justify-center mb-4">
-                  <div className="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <stat.icon className="h-6 w-6 text-white" />
+                  <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow-inner">
+                    <stat.icon className={`h-7 w-7 ${stat.iconColor}`} />
                   </div>
                 </div>
-                <div className="text-3xl md:text-4xl font-bold mb-2 text-white">{stat.value}</div>
-                <div className="text-sm font-semibold mb-1 text-white">{stat.label}</div>
-                <div className="text-xs text-white/80">{stat.detail}</div>
+                <div className="text-3xl md:text-4xl font-extrabold mb-2 text-white">{stat.value}</div>
+                <div className="text-sm font-bold mb-1 text-emerald-50 uppercase tracking-wider">{stat.label}</div>
+                <div className="text-xs text-white/80 font-medium">{stat.detail}</div>
               </div>
             </motion.div>
           ))}
