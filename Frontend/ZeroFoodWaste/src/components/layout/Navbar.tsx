@@ -78,16 +78,16 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/75 dark:bg-card/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-border shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-hero flex items-center justify-center shadow-md group-hover:shadow-glow transition-shadow duration-300">
-              <Leaf className="w-5 h-5 text-primary-foreground" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+              <Leaf className="w-[18px] h-[18px] text-white" />
             </div>
-            <span className="text-xl font-bold text-foreground">
-              Zero<span className="text-primary">FoodWaste</span>
+            <span className="text-xl font-bold text-foreground tracking-tight">
+              Zero<span className="text-emerald-600">FoodWaste</span>
             </span>
           </Link>
 

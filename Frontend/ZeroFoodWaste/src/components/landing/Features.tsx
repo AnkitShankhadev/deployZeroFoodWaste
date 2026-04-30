@@ -56,8 +56,8 @@ export const Features = () => {
                 transition={{ duration: 0.6 }}
                 className="w-full md:w-1/2"
               >
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-emerald-100/50 border-8 border-white group">
-                  <img src={feature.image} alt={feature.title} className="w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-700 ease-in-out" />
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-emerald-100/50 border-8 border-white hover-lift image-zoom-container group">
+                  <img src={feature.image} alt={feature.title} className="w-full h-80 object-cover image-zoom" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                 </div>
               </motion.div>

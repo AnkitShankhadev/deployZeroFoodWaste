@@ -254,14 +254,16 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-500 via-green-600 to-green-700 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
-        </div>
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-green-900">
+        {/* Photographic Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center z-0 mix-blend-overlay opacity-60"
+          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200')` }}
+        />
+        {/* Gradient Overlay for Text Legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-green-950 via-green-900/80 to-green-800/40 z-0" />
 
-        <div className="relative z-10 flex flex-col justify-center p-12 text-white">
+        <div className="relative z-10 flex flex-col justify-center p-12 text-white w-full">
           <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-white/80 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
             Back to home
@@ -309,7 +311,7 @@ const Auth = () => {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-10 bg-[#fafaf8]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -325,10 +327,10 @@ const Auth = () => {
           </Link>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              {mode === "login" ? "Sign in to your account" : "Create your account"}
+            <h2 className="text-2xl font-bold text-slate-800 mb-2 tracking-tight">
+              {mode === "login" ? "Welcome back" : "Create your account"}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-slate-500 text-sm">
               {mode === "login" ? (
                 <>
                   Don't have an account?{" "}

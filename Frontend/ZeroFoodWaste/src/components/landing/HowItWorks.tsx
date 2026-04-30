@@ -7,7 +7,7 @@ const steps = [
     title: "List Your Food",
     description: "Snap a photo, add details about quantity and expiry. Our simple interface makes it easy to log surplus food in less than a minute. Real-time updates ensure your listing is visible instantly.",
     color: "from-green-400 to-green-600",
-    image: "/images/landing/step1.png",
+    image: "https://images.unsplash.com/photo-1615897277884-a130f1d0639e?auto=format&fit=crop&q=80&w=800",
     bgAccent: "bg-green-100",
     textColor: "text-green-600",
   },
@@ -15,26 +15,26 @@ const steps = [
     number: "02",
     title: "Get Matched",
     description: "Our intelligent geography-based system instantly finds nearby NGOs and community centers who can accept and distribute your donation quickly, minimizing transit times and maximizing freshness.",
-    color: "from-blue-400 to-blue-600",
-    image: "/images/landing/step2.png",
-    bgAccent: "bg-blue-100",
-    textColor: "text-blue-600",
+    color: "from-emerald-400 to-emerald-600",
+    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=800",
+    bgAccent: "bg-emerald-100",
+    textColor: "text-emerald-600",
   },
   {
     number: "03",
     title: "Easy Pickup",
     description: "A registered volunteer picks up the food at your convenience. You can track the entire journey of your donation from your doorstep to its final destination with full transparency.",
-    color: "from-purple-400 to-purple-600",
-    image: "/images/landing/step3.png",
-    bgAccent: "bg-purple-100",
-    textColor: "text-purple-600",
+    color: "from-teal-400 to-teal-600",
+    image: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&q=80&w=800",
+    bgAccent: "bg-teal-100",
+    textColor: "text-teal-600",
   },
   {
     number: "04",
     title: "Make Impact",
     description: "Your surplus food reaches those in need, fostering community support and reducing landfill waste. Earn platform points and watch your personal positive impact grow over time.",
     color: "from-amber-400 to-amber-600",
-    image: "/images/landing/step4.png",
+    image: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&q=80&w=800",
     bgAccent: "bg-amber-100",
     textColor: "text-amber-600",
   },
@@ -83,15 +83,17 @@ export const HowItWorks = () => {
                   transition={{ duration: 0.6 }}
                   className="w-full lg:w-1/2"
                 >
-                  <div className="relative group rounded-3xl overflow-hidden shadow-xl">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10" />
+                  <div className="relative image-zoom-container rounded-3xl overflow-hidden shadow-2xl shadow-emerald-100/40 border-8 border-white hover-lift">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10 pointer-events-none" />
                     <img
                       src={step.image}
                       alt={step.title}
-                      className="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-72 lg:h-80 object-cover image-zoom"
                     />
-
-
+                    {/* Step number badge */}
+                    <div className="absolute top-4 left-4 z-20 w-12 h-12 rounded-2xl bg-white/90 backdrop-blur flex items-center justify-center shadow-lg">
+                      <span className={`text-base font-black ${step.textColor}`}>{step.number}</span>
+                    </div>
                   </div>
                 </motion.div>
 
@@ -104,7 +106,7 @@ export const HowItWorks = () => {
                   className="w-full lg:w-1/2 flex flex-col justify-center"
                 >
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="text-6xl font-black text-muted select-none">
+                    <div className={`text-5xl font-black select-none ${step.textColor} opacity-20`}>
                       {step.number}
                     </div>
                     <div className="h-0.5 w-12 bg-border"></div>

@@ -21,10 +21,12 @@ import {
   Building2,
   ArrowRight,
   Timer,
+  Lock,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { buildVolunteerAchievements, useAchievementNotifications } from "@/hooks/useAchievements";
 
 const foodTypeEmojis: Record<string, string> = {
   Vegetables: "🥕",
@@ -191,6 +193,17 @@ const VolunteerDashboard = () => {
     };
   }, [assignments]);
 
+  const achievements = useMemo(
+    () => buildVolunteerAchievements({
+      totalDeliveries: stats.totalDeliveries,
+      deliveriesToday: stats.deliveriesToday,
+      totalPoints: user?.totalPoints ?? 0,
+    }),
+    [stats, user?.totalPoints]
+  );
+
+  useAchievementNotifications(achievements, user?.id);
+
   const handleMarkPickedUp = async () => {
     if (!currentTask) return;
 
@@ -280,43 +293,43 @@ const VolunteerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f7f8f5]">
       <Navbar />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-20 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <Bike className="w-8 h-8 text-white" />
+          {/* Hero Greeting Banner */}
+          <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-violet-700 to-purple-700 shadow-xl">
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-15"
+              style={{ backgroundImage: `url('https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&q=80&w=1600')` }}
+            />
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-8 md:p-10">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+                  <Bike className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <p className="text-violet-200 text-sm font-semibold uppercase tracking-widest mb-1">Volunteer Dashboard</p>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                    Hey, {user?.name?.split(' ')[0] || "Volunteer"} 🚴
+                  </h1>
+                  <p className="text-violet-100/80 mt-1 text-sm">
+                    {currentTask ? "You have an active delivery" : "No active deliveries right now"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">
-                  Hey, {user?.name || "Volunteer"}! 🚴
-                </h1>
-                <p className="text-muted-foreground mt-1">
-                  {currentTask
-                    ? "You have an active delivery"
-                    : "No active deliveries right now"}
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="text-violet-200 text-xs font-semibold uppercase tracking-wider">Today's Earnings</p>
+                  <p className="text-3xl font-black text-white">{stats.deliveriesToday * 50} pts</p>
+                </div>
+                <Link to="/map">
+                  <Button size="lg" className="gap-2 bg-white text-violet-700 font-bold hover:bg-violet-50 rounded-full px-6 shadow-lg hover:-translate-y-0.5 transition-all">
+                    <Navigation className="w-5 h-5" /> Open Map
+                  </Button>
+                </Link>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">
-                  Today's Earnings
-                </p>
-                <p className="text-2xl font-bold text-primary">
-                  {stats.deliveriesToday * 50} pts
-                </p>
-              </div>
-              <Link to="/map">
-                <Button variant="hero" size="lg" className="gap-2">
-                  <Navigation className="w-5 h-5" />
-                  Open Map
-                </Button>
-              </Link>
             </div>
           </div>
 
@@ -348,27 +361,17 @@ const VolunteerDashboard = () => {
                 bg: "bg-amber-100",
               },
             ].map((stat, index) => (
-              <motion.div
-                key={stat.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="border-border/50 hover:shadow-md transition-shadow">
+              <motion.div key={stat.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
+                <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-white overflow-hidden">
+                  <div style={{ background: stat.color.includes('primary') ? 'hsl(152 60% 32%)' : stat.color.includes('green') ? '#16a34a' : '#d97706' }} className="h-1 w-full" />
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          {stat.title}
-                        </p>
-                        <p className="text-3xl font-bold text-foreground">
-                          {stat.value}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {stat.change}
-                        </p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{stat.title}</p>
+                        <p className="text-4xl font-black text-slate-800 tracking-tight">{stat.value}</p>
+                        <p className="text-sm text-muted-foreground mt-1.5">{stat.change}</p>
                       </div>
-                      <div className={`p-3 rounded-xl ${stat.bg}`}>
+                      <div className={`p-3 rounded-2xl ${stat.bg}`}>
                         <stat.icon className={`w-6 h-6 ${stat.color}`} />
                       </div>
                     </div>
@@ -378,177 +381,107 @@ const VolunteerDashboard = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Current Task */}
             <div className="lg:col-span-2">
-              <Card className="border-border/50 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-                <CardHeader>
+              <Card className="border-0 shadow-sm bg-white overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-600" />
+                <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                    <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-800">
+                      <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse" />
                       Active Delivery
                     </CardTitle>
-                    <Badge className="bg-primary text-primary-foreground">
-                      {currentTask
-                        ? currentTask.status.replace("_", " ")
-                        : "None"}
+                    <Badge className="bg-violet-100 text-violet-700 border-violet-200 font-semibold text-xs">
+                      {currentTask ? currentTask.status.replace("_", " ") : "None"}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-5">
                   {isLoading ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-muted-foreground">
-                        Loading your tasks...
-                      </p>
-                    </div>
+                    <div className="text-center py-8"><p className="text-sm text-muted-foreground">Loading your tasks...</p></div>
                   ) : error ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-destructive">{error}</p>
-                    </div>
+                    <div className="text-center py-8"><p className="text-sm text-destructive">{error}</p></div>
                   ) : !currentTask ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-muted-foreground">
-                        You currently have no active delivery. Check available
-                        tasks below.
-                      </p>
+                    <div className="text-center py-10">
+                      <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                        <Bike className="w-8 h-8 text-slate-400" />
+                      </div>
+                      <p className="text-sm font-medium text-slate-500">No active delivery right now</p>
+                      <p className="text-xs text-muted-foreground mt-1">Check available tasks below</p>
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between bg-slate-50 rounded-2xl px-4 py-3">
                         <div>
-                          <h3 className="text-xl font-semibold text-foreground">
-                            {currentTask.donationId.foodType}
-                          </h3>
-                          <p className="text-muted-foreground">
-                            {currentTask.donationId.quantity}
-                          </p>
+                          <h3 className="text-lg font-bold text-slate-800">{currentTask.donationId.foodType}</h3>
+                          <p className="text-sm text-muted-foreground">{currentTask.donationId.quantity}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-muted-foreground">
-                            Assigned
-                          </p>
-                          <p className="text-lg font-semibold text-primary">
-                            {new Date(
-                              currentTask.assignedAt,
-                            ).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Assigned at</p>
+                          <p className="text-base font-bold text-violet-600">
+                            {new Date(currentTask.assignedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </p>
                         </div>
                       </div>
 
                       {/* Route visualization */}
-                      <div className="relative">
-                        <div className="flex items-start gap-4">
-                          {/* Pickup */}
-                          <div className="flex-1 p-4 rounded-xl bg-amber-50 border border-amber-200">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
-                                <MapPin className="w-4 h-4 text-white" />
-                              </div>
-                              <span className="text-sm font-medium text-amber-700">
-                                PICKUP
-                              </span>
+                      <div className="flex items-stretch gap-3">
+                        {/* Pickup */}
+                        <div className="flex-1 p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-7 h-7 rounded-xl bg-amber-500 flex items-center justify-center">
+                              <MapPin className="w-3.5 h-3.5 text-white" />
                             </div>
-                            <h4 className="font-medium text-foreground">
-                              {currentTask.donationId.donorId?.name || "Donor"}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {currentTask.donationId.donorId?.location
-                                ?.address ||
-                                currentTask.donationId.donorId?.address ||
-                                "Pickup address not available"}
-                            </p>
-                            {currentTask.donationId.donorId?.phone && (
-                              <a
-                                href={`tel:${currentTask.donationId.donorId.phone}`}
-                                className="inline-flex items-center gap-1 text-sm text-primary mt-2 hover:underline"
-                              >
-                                <Phone className="w-3 h-3" />
-                                {currentTask.donationId.donorId.phone}
-                              </a>
-                            )}
+                            <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Pickup</span>
                           </div>
-
-                          {/* Arrow */}
-                          <div className="flex items-center justify-center py-8">
-                            <ArrowRight className="w-6 h-6 text-muted-foreground" />
+                          <h4 className="font-semibold text-slate-800 text-sm">{currentTask.donationId.donorId?.name || "Donor"}</h4>
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                            {currentTask.donationId.donorId?.location?.address || currentTask.donationId.donorId?.address || "Address not available"}
+                          </p>
+                          {currentTask.donationId.donorId?.phone && (
+                            <a href={`tel:${currentTask.donationId.donorId.phone}`} className="inline-flex items-center gap-1 text-xs text-violet-600 mt-2 hover:underline font-medium">
+                              <Phone className="w-3 h-3" />{currentTask.donationId.donorId.phone}
+                            </a>
+                          )}
+                        </div>
+                        {/* Arrow */}
+                        <div className="flex items-center justify-center px-1">
+                          <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center">
+                            <ArrowRight className="w-4 h-4 text-slate-500" />
                           </div>
-
-                          {/* Dropoff */}
-                          <div className="flex-1 p-4 rounded-xl bg-green-50 border border-green-200">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                                <Building2 className="w-4 h-4 text-white" />
-                              </div>
-                              <span className="text-sm font-medium text-green-700">
-                                DROP-OFF
-                              </span>
+                        </div>
+                        {/* Dropoff */}
+                        <div className="flex-1 p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-7 h-7 rounded-xl bg-emerald-500 flex items-center justify-center">
+                              <Building2 className="w-3.5 h-3.5 text-white" />
                             </div>
-                            <h4 className="font-medium text-foreground">
-                              {currentTask.donationId.acceptedBy?.name || "NGO"}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {currentTask.donationId.acceptedBy?.location
-                                ?.address || "Drop-off address not available"}
-                            </p>
-                            {currentTask.donationId.acceptedBy?.phone && (
-                              <a
-                                href={`tel:${currentTask.donationId.acceptedBy.phone}`}
-                                className="inline-flex items-center gap-1 text-sm text-primary mt-2 hover:underline"
-                              >
-                                <Phone className="w-3 h-3" />
-                                {currentTask.donationId.acceptedBy.phone}
-                              </a>
-                            )}
+                            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Drop-off</span>
                           </div>
+                          <h4 className="font-semibold text-slate-800 text-sm">{currentTask.donationId.acceptedBy?.name || "NGO"}</h4>
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                            {currentTask.donationId.acceptedBy?.location?.address || "Address not available"}
+                          </p>
+                          {currentTask.donationId.acceptedBy?.phone && (
+                            <a href={`tel:${currentTask.donationId.acceptedBy.phone}`} className="inline-flex items-center gap-1 text-xs text-violet-600 mt-2 hover:underline font-medium">
+                              <Phone className="w-3 h-3" />{currentTask.donationId.acceptedBy.phone}
+                            </a>
+                          )}
                         </div>
                       </div>
 
-                      <div className="flex gap-3">
-                        <Button variant="outline" className="flex-1 gap-2">
-                          <Navigation className="w-4 h-4" />
-                          Navigate
+                      <div className="flex gap-3 pt-1">
+                        <Button variant="outline" className="flex-1 gap-2 rounded-xl h-11 border-slate-200 hover:border-violet-300 hover:text-violet-700 hover:bg-violet-50 transition-all">
+                          <Navigation className="w-4 h-4" />Navigate
                         </Button>
                         {currentTask.status === "PENDING" ? (
-                          <Button
-                            variant="hero"
-                            className="flex-1 gap-2"
-                            onClick={handleMarkPickedUp}
-                            disabled={isMarkingPickedUp}
-                          >
-                            {isMarkingPickedUp ? (
-                              <>
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                Picking up...
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle className="w-4 h-4" />
-                                Mark as Picked Up
-                              </>
-                            )}
+                          <Button className="flex-1 gap-2 rounded-xl h-11 bg-amber-500 hover:bg-amber-600 text-white font-bold" onClick={handleMarkPickedUp} disabled={isMarkingPickedUp}>
+                            {isMarkingPickedUp ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Picking up...</> : <><CheckCircle className="w-4 h-4" />Mark as Picked Up</>}
                           </Button>
                         ) : (
-                          <Button
-                            variant="hero"
-                            className="flex-1 gap-2"
-                            onClick={handleMarkCompleted}
-                            disabled={isMarkingCompleted}
-                          >
-                            {isMarkingCompleted ? (
-                              <>
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                Completing...
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle className="w-4 h-4" />
-                                Mark as Completed
-                              </>
-                            )}
+                          <Button className="flex-1 gap-2 rounded-xl h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold" onClick={handleMarkCompleted} disabled={isMarkingCompleted}>
+                            {isMarkingCompleted ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Completing...</> : <><CheckCircle className="w-4 h-4" />Mark as Completed</>}
                           </Button>
                         )}
                       </div>
@@ -559,73 +492,51 @@ const VolunteerDashboard = () => {
             </div>
 
             {/* Progress & Stats */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Daily Progress */}
-              <Card className="border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2">
-                    <Star className="w-5 h-5 text-amber-500" />
+              <Card className="border-0 shadow-sm bg-white overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-400" />
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-700">
+                    <Star className="w-4 h-4 text-amber-500" />
                     Daily Goal
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center mb-4">
-                    <p className="text-4xl font-bold text-foreground">
-                      {stats.deliveriesToday}/5
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Deliveries completed
-                    </p>
+                  <div className="flex items-end gap-2 mb-3">
+                    <p className="text-5xl font-black text-slate-800 tracking-tight">{stats.deliveriesToday}</p>
+                    <p className="text-2xl font-bold text-muted-foreground mb-1">/5</p>
                   </div>
-                  <Progress
-                    value={Math.min(100, (stats.deliveriesToday / 5) * 100)}
-                    className="h-3 mb-4"
-                  />
-                  <p className="text-sm text-center text-muted-foreground">
-                    {stats.deliveriesToday >= 5
-                      ? "Goal achieved! 🎉"
-                      : `Complete ${5 - stats.deliveriesToday} more to earn a bonus! 🎉`}
+                  <Progress value={Math.min(100, (stats.deliveriesToday / 5) * 100)} className="h-2.5 mb-3" />
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {stats.deliveriesToday >= 5 ? "🎉 Goal achieved! Great work!" : `${5 - stats.deliveriesToday} more for bonus`}
                   </p>
                 </CardContent>
               </Card>
-
               {/* Completed Today */}
-              <Card className="border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
+              <Card className="border-0 shadow-sm bg-white">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-700">
+                    <CheckCircle className="w-4 h-4 text-emerald-500" />
                     Completed Today
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-2">
                   {completedToday.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      No deliveries completed yet today
-                    </p>
+                    <p className="text-xs text-muted-foreground text-center py-3">No deliveries yet today</p>
                   ) : (
                     completedToday.map((task) => (
-                      <div
-                        key={task.id}
-                        className="flex items-center justify-between p-3 rounded-lg bg-green-50"
-                      >
-                        <div>
-                        <div className="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center text-2xl">
-                        {foodTypeEmojis[task.title] || "🍽️"}
-
-                      </div>
-                          <p className="font-medium text-foreground">
-                            {task.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {task.quantity} kg
-                          </p>
+                      <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-lg">
+                            {foodTypeEmojis[task.title] || "🍽️"}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-slate-800 text-sm">{task.title}</p>
+                            <p className="text-xs text-muted-foreground">{task.quantity} kg</p>
+                          </div>
                         </div>
-                        <Badge
-                          variant="secondary"
-                          className="bg-green-100 text-green-700"
-                        >
-                          +{task.points} pts
-                        </Badge>
+                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 font-bold text-xs">+{task.points} pts</Badge>
                       </div>
                     ))
                   )}
@@ -634,35 +545,29 @@ const VolunteerDashboard = () => {
             </div>
 
             {/* Available Tasks */}
-            <Card className="border-border/50 lg:col-span-3">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-xl flex items-center gap-2">
+            <Card className="border-0 shadow-sm bg-white lg:col-span-3">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-800">
                   <Clock className="w-5 h-5 text-amber-500" />
                   Available Tasks from NGOs
                 </CardTitle>
                 <Link to="/map">
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    View on map
-                    <ChevronRight className="w-4 h-4" />
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs h-7 text-muted-foreground hover:text-violet-600">
+                    View on map <ChevronRight className="w-3 h-3" />
                   </Button>
                 </Link>
               </CardHeader>
               <CardContent>
                 {isLoadingTasks ? (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground">
-                      Loading available tasks...
-                    </p>
-                  </div>
+                  <div className="text-center py-8"><p className="text-sm text-muted-foreground">Loading available tasks...</p></div>
                 ) : taskError ? (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-destructive">{taskError}</p>
-                  </div>
+                  <div className="text-center py-8"><p className="text-sm text-destructive">{taskError}</p></div>
                 ) : availableTasks.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground">
-                      No available tasks right now. Check back soon!
-                    </p>
+                    <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                      <Clock className="w-7 h-7 text-slate-400" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">No available tasks right now. Check back soon!</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -671,24 +576,15 @@ const VolunteerDashboard = () => {
                         key={task._id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="p-4 rounded-xl border border-border hover:border-primary/50 hover:shadow-md transition-all"
+                        transition={{ delay: index * 0.08 }}
+                        className="p-4 rounded-2xl border border-slate-200 bg-[#fafaf8] hover:border-violet-300 hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h4 className="font-medium text-foreground">
-                              {task.foodType}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {task.quantity}
-                            </p>
+                            <h4 className="font-bold text-slate-800 text-sm">{task.foodType}</h4>
+                            <p className="text-xs text-muted-foreground">{task.quantity}</p>
                           </div>
-                          <Badge
-                            variant="secondary"
-                            className="bg-primary/10 text-primary"
-                          >
-                            +50 pts
-                          </Badge>
+                          <Badge variant="secondary" className="bg-violet-100 text-violet-700 font-bold text-xs">+50 pts</Badge>
                         </div>
                         <div className="space-y-2 text-sm text-muted-foreground mb-4">
                           <p className="flex items-center gap-2">
@@ -742,6 +638,61 @@ const VolunteerDashboard = () => {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Achievements */}
+            <Card className="border-0 shadow-sm bg-white lg:col-span-3">
+              <CardHeader className="flex flex-row items-center justify-between pb-3">
+                <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-amber-500" />
+                  Achievements
+                  <span className="ml-1 inline-flex items-center justify-center rounded-full bg-violet-100 text-violet-700 text-[10px] font-bold px-2 py-0.5">
+                    {achievements.filter(a => a.unlocked).length}/{achievements.length}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                  {achievements.map((achievement) => (
+                    <motion.div
+                      key={achievement.id}
+                      initial={false}
+                      animate={achievement.unlocked ? { scale: [1, 1.02, 1] } : {}}
+                      transition={{ duration: 0.4 }}
+                      className={`flex items-start gap-3 p-3 rounded-2xl transition-all ${
+                        achievement.unlocked
+                          ? "bg-gradient-to-r from-violet-50 to-purple-50 ring-1 ring-violet-200/80"
+                          : "bg-slate-50/80"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm ${
+                        achievement.unlocked ? "bg-white" : "bg-slate-100 grayscale opacity-50"
+                      }`}>
+                        {achievement.unlocked ? achievement.emoji : <Lock className="w-4 h-4 text-slate-400" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-0.5">
+                          <p className={`text-xs font-bold truncate ${achievement.unlocked ? "text-slate-800" : "text-slate-400"}`}>
+                            {achievement.name}
+                          </p>
+                          {achievement.unlocked && (
+                            <span className="flex-shrink-0 text-[10px] font-bold text-violet-600 bg-violet-100 px-1.5 py-0.5 rounded-full">✓ Done</span>
+                          )}
+                        </div>
+                        <p className={`text-[10px] leading-tight mb-1.5 ${achievement.unlocked ? "text-muted-foreground" : "text-slate-400"}`}>
+                          {achievement.description}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Progress value={achievement.progress} className={`h-1.5 flex-1 ${achievement.unlocked ? "" : "opacity-40"}`} />
+                          <span className={`text-[10px] font-semibold flex-shrink-0 ${achievement.unlocked ? "text-violet-600" : "text-slate-400"}`}>
+                            {achievement.progressLabel}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>

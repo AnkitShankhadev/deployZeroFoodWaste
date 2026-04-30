@@ -1,12 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
-import AchievementsShowcase from "@/components/achievements/AchievementsShowcase";
+import {
+  buildDonorAchievements,
+  buildNGOAchievements,
+  buildVolunteerAchievements,
+  useAchievementNotifications,
+  type Achievement,
+} from "@/hooks/useAchievements";
 import {
   Trophy,
   Star,
@@ -15,6 +23,9 @@ import {
   Building2,
   Users,
   Loader,
+  Lock,
+  ChevronRight,
+  Medal,
 } from "lucide-react";
 
 type TabType = "donors" | "ngos" | "volunteers";
@@ -39,29 +50,38 @@ interface UserRank {
   badgesCount?: number;
 }
 
-interface Achievement {
-  _id: string;
-  title: string;
-  description: string;
-  icon: string;
-  earnedAt?: string;
-}
-
 const roleMap: Record<TabType, string> = {
   donors: "DONOR",
   ngos: "NGO",
   volunteers: "VOLUNTEER",
 };
 
+const tabColors: Record<TabType, { active: string; bg: string; accent: string; badge: string }> = {
+  donors: {
+    active: "text-emerald-700 border-emerald-600 bg-emerald-50/60",
+    bg: "from-emerald-700 to-teal-600",
+    accent: "text-emerald-600",
+    badge: "bg-emerald-100 text-emerald-700",
+  },
+  ngos: {
+    active: "text-blue-700 border-blue-600 bg-blue-50/60",
+    bg: "from-blue-700 to-indigo-700",
+    accent: "text-blue-600",
+    badge: "bg-blue-100 text-blue-700",
+  },
+  volunteers: {
+    active: "text-violet-700 border-violet-600 bg-violet-50/60",
+    bg: "from-violet-700 to-purple-700",
+    accent: "text-violet-600",
+    badge: "bg-violet-100 text-violet-700",
+  },
+};
+
 const LeaderboardPage = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>("donors");
-  const [timeframe, setTimeframe] = useState("monthly");
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
-    [],
-  );
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [userRank, setUserRank] = useState<UserRank | null>(null);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,23 +125,47 @@ const LeaderboardPage = () => {
     fetchUserRank();
   }, [user]);
 
-  // Fetch achievements
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      try {
-        if (!user) return;
-        const response = await api.get<{
-          success: boolean;
-          data: { achievements: Achievement[] };
-        }>("/achievements");
-        setAchievements(response.data.achievements || []);
-      } catch (err) {
-        console.error("Error fetching achievements:", err);
-      }
-    };
+  // Build achievements based on user role
+  const achievements: Achievement[] = useMemo(() => {
+    if (!user) return [];
 
-    fetchAchievements();
-  }, [user]);
+    const role = user.role?.toUpperCase();
+
+    if (role === "DONOR") {
+      return buildDonorAchievements({
+        completed: userRank?.donationsCount ?? 0,
+        active: 0,
+        totalQuantity: 0,
+        total: userRank?.donationsCount ?? 0,
+      });
+    } else if (role === "NGO") {
+      return buildNGOAchievements({
+        collectedKg: 0,
+        activePickups: 0,
+        completedCount: userRank?.donationsCount ?? 0,
+        peopleFed: 0,
+      });
+    } else if (role === "VOLUNTEER") {
+      return buildVolunteerAchievements({
+        totalDeliveries: userRank?.pickupsCount ?? 0,
+        deliveriesToday: 0,
+        totalPoints: userRank?.totalPoints ?? user.totalPoints ?? 0,
+      });
+    }
+
+    // Fallback: show donor achievements
+    return buildDonorAchievements({
+      completed: 0,
+      active: 0,
+      totalQuantity: 0,
+      total: 0,
+    });
+  }, [user, userRank]);
+
+  useAchievementNotifications(achievements, user?.id);
+
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const colors = tabColors[activeTab];
 
   const tabs = [
     { id: "donors" as TabType, label: "Donors", icon: Gift },
@@ -129,42 +173,78 @@ const LeaderboardPage = () => {
     { id: "volunteers" as TabType, label: "Volunteers", icon: Users },
   ];
 
-  const getLeaderboardTitle = () => {
-    const titles: Record<TabType, string> = {
-      donors: "Donors",
-      ngos: "NGOs",
-      volunteers: "Volunteers",
-    };
-    return titles[activeTab];
-  };
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f7f8f5]">
       <Navbar />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-20 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring" }}
-              className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center mb-6 shadow-lg"
-            >
-              <Trophy className="w-10 h-10 text-white" />
-            </motion.div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Leaderboard & Achievements
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Celebrate our top contributors making a difference in fighting
-              food waste
-            </p>
+          {/* Hero Banner */}
+          <div className={`relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r ${colors.bg} shadow-xl`}>
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-10"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80&w=1600')`,
+              }}
+            />
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 p-8 md:p-10">
+              <div className="flex items-center gap-4">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", duration: 0.8 }}
+                  className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0"
+                >
+                  <Trophy className="w-8 h-8 text-white" />
+                </motion.div>
+                <div>
+                  <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-1">
+                    Community Rankings
+                  </p>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                    Leaderboard & Achievements
+                  </h1>
+                  <p className="text-white/70 mt-1 text-sm">
+                    Celebrating our top contributors making a difference
+                  </p>
+                </div>
+              </div>
+              {/* User mini-stats */}
+              {userRank && (
+                <div className="flex gap-6">
+                  <div className="text-center">
+                    <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">
+                      Your Rank
+                    </p>
+                    <p className="text-3xl font-black text-white">
+                      {userRank.rank ? `#${userRank.rank}` : "—"}
+                    </p>
+                  </div>
+                  <div className="w-px bg-white/20" />
+                  <div className="text-center">
+                    <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">
+                      Points
+                    </p>
+                    <p className="text-3xl font-black text-white">
+                      {userRank.totalPoints?.toLocaleString() || 0}
+                    </p>
+                  </div>
+                  <div className="w-px bg-white/20" />
+                  <div className="text-center">
+                    <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">
+                      Top
+                    </p>
+                    <p className="text-3xl font-black text-white">
+                      {userRank.percentile || "—"}%
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          {/* Stat Summary Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
               {
                 label: "Total Saved",
@@ -172,101 +252,86 @@ const LeaderboardPage = () => {
                   leaderboardData.length > 0
                     ? `${(leaderboardData.reduce((sum, item) => sum + (item.totalPoints || 0), 0) / 100).toFixed(0)} kg`
                     : "0 kg",
-                icon: "🌱",
+                emoji: "🌱",
+                color: "from-emerald-50 to-green-50 ring-emerald-200/60",
               },
               {
                 label: "Active Users",
                 value: userRank?.totalUsers?.toLocaleString() || "0",
-                icon: "👥",
+                emoji: "👥",
+                color: "from-blue-50 to-indigo-50 ring-blue-200/60",
               },
               {
                 label: "Your Points",
                 value: userRank?.totalPoints?.toLocaleString() || "0",
-                icon: "🎁",
+                emoji: "💎",
+                color: "from-violet-50 to-purple-50 ring-violet-200/60",
               },
               {
-                label: "Your Rank",
-                value: userRank?.rank ? `#${userRank.rank}` : "—",
-                icon: "📊",
+                label: "Achievements",
+                value: `${unlockedCount}/${achievements.length}`,
+                emoji: "🏆",
+                color: "from-amber-50 to-orange-50 ring-amber-200/60",
               },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-card rounded-xl border border-border p-4 text-center"
+                transition={{ delay: i * 0.08 }}
+                className={`bg-gradient-to-br ${stat.color} ring-1 rounded-2xl p-5 text-center shadow-sm`}
               >
-                <span className="text-2xl mb-2 block">{stat.icon}</span>
-                <div className="text-xl font-bold text-foreground">
+                <span className="text-2xl mb-2 block">{stat.emoji}</span>
+                <div className="text-2xl font-black text-slate-800 tracking-tight">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-1">
                   {stat.label}
                 </div>
               </motion.div>
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Leaderboard */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Leaderboard Table */}
             <div className="lg:col-span-2">
-              <div className="bg-card rounded-2xl border border-border overflow-hidden">
+              <Card className="border-0 shadow-sm bg-white overflow-hidden">
                 {/* Tabs */}
-                <div className="flex border-b border-border">
+                <div className="flex border-b border-slate-100">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex-1 px-4 py-4 flex items-center justify-center gap-2 font-medium transition-colors ${
+                      className={`flex-1 px-4 py-3.5 flex items-center justify-center gap-2 text-sm font-semibold transition-all border-b-2 ${
                         activeTab === tab.id
-                          ? "text-primary border-b-2 border-primary bg-green-50/50"
-                          : "text-muted-foreground hover:text-foreground"
+                          ? `${colors.active} border-current`
+                          : "text-muted-foreground hover:text-slate-700 border-transparent"
                       }`}
                     >
-                      <tab.icon className="w-5 h-5" />
+                      <tab.icon className="w-4 h-4" />
                       {tab.label}
                     </button>
                   ))}
                 </div>
 
-                {/* Timeframe selector */}
-                <div className="p-4 border-b border-border flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">
-                    Top {getLeaderboardTitle()}
-                  </h3>
-                  <div className="flex gap-2">
-                    {["all-time"].map((tf) => (
-                      <Button
-                        key={tf}
-                        variant={timeframe === tf ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => setTimeframe(tf)}
-                      >
-                        {tf.charAt(0).toUpperCase() +
-                          tf.slice(1).replace("-", " ")}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Leaderboard List */}
-                <div className="divide-y divide-border">
+                <div className="divide-y divide-slate-100">
                   {loading ? (
-                    <div className="p-8 text-center">
-                      <Loader className="w-6 h-6 animate-spin mx-auto mb-2" />
-                      <p className="text-muted-foreground">
-                        Loading leaderboard...
-                      </p>
+                    <div className="p-10 text-center">
+                      <Loader className="w-5 h-5 animate-spin mx-auto mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Loading leaderboard...</p>
                     </div>
                   ) : error ? (
-                    <div className="p-8 text-center">
-                      <p className="text-red-600">{error}</p>
+                    <div className="p-10 text-center">
+                      <p className="text-sm text-red-600">{error}</p>
                     </div>
                   ) : leaderboardData.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <p className="text-muted-foreground">
-                        No leaderboard data available
+                    <div className="p-10 text-center">
+                      <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                        <Trophy className="w-7 h-7 text-slate-400" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        No leaderboard data available yet
                       </p>
                     </div>
                   ) : (
@@ -275,23 +340,23 @@ const LeaderboardPage = () => {
                         key={`${item.userId._id || item.userId.email}-${item.rank}`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className={`p-4 flex items-center gap-4 hover:bg-muted/50 transition-colors ${
+                        transition={{ delay: index * 0.04 }}
+                        className={`px-5 py-4 flex items-center gap-4 hover:bg-slate-50/80 transition-colors ${
                           item.rank <= 3
-                            ? "bg-gradient-to-r from-amber-50/50 to-transparent"
+                            ? "bg-gradient-to-r from-amber-50/40 to-transparent"
                             : ""
                         }`}
                       >
                         {/* Rank */}
                         <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0 ${
                             item.rank === 1
-                              ? "bg-amber-100 text-amber-600"
+                              ? "bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-md"
                               : item.rank === 2
-                                ? "bg-gray-100 text-gray-600"
+                                ? "bg-gradient-to-br from-slate-300 to-slate-400 text-white shadow-md"
                                 : item.rank === 3
-                                  ? "bg-orange-100 text-orange-600"
-                                  : "bg-muted text-muted-foreground"
+                                  ? "bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-md"
+                                  : "bg-slate-100 text-slate-500"
                           }`}
                         >
                           {item.rank <= 3
@@ -299,108 +364,169 @@ const LeaderboardPage = () => {
                             : item.rank}
                         </div>
 
-                        {/* Avatar & Name */}
-                        <div className="flex-1">
-                          <div className="font-medium text-foreground">
+                        {/* Avatar placeholder + Name */}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-slate-800 text-sm truncate">
                             {item.userId.name}
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             {activeTab === "donors" &&
                               `${item.donationsCount || 0} donations`}
                             {activeTab === "ngos" &&
                               `${item.collectionsCount || 0} collections`}
                             {activeTab === "volunteers" &&
-                              `${item.pickupsCount || 0} pickups`}
+                              `${item.pickupsCount || 0} deliveries`}
                           </div>
                         </div>
 
                         {/* Points */}
-                        <div className="text-right">
-                          <div className="font-bold text-foreground">
+                        <div className="text-right flex-shrink-0">
+                          <div className="font-black text-slate-800 text-sm">
                             {item.totalPoints?.toLocaleString() || 0}
                           </div>
-                          <div className="text-sm text-muted-foreground flex items-center justify-end gap-1">
-                            <TrendingUp className="w-3 h-3" />
-                            ~trending
+                          <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                            points
                           </div>
                         </div>
                       </motion.div>
                     ))
                   )}
                 </div>
-              </div>
+              </Card>
             </div>
 
-            {/* Achievements */}
-            <div>
-              <div className="bg-card rounded-2xl border border-border p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                    <Star className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">
-                      Your Achievements
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {achievements.length > 0
-                        ? `${achievements.filter((a) => a.earnedAt).length} of ${achievements.length} unlocked`
-                        : "0 achievements"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
+            {/* Achievements Sidebar */}
+            <div className="space-y-5">
+              <Card className="border-0 shadow-sm bg-white">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-500" />
+                    Your Achievements
+                    <span className={`ml-auto inline-flex items-center justify-center rounded-full text-[10px] font-bold px-2 py-0.5 ${colors.badge}`}>
+                      {unlockedCount}/{achievements.length}
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2.5 pt-0">
                   {achievements.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground">
-                        No achievements yet. Keep contributing!
+                    <div className="text-center py-6">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                        <Medal className="w-6 h-6 text-slate-400" />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Sign in to track your achievements
                       </p>
                     </div>
                   ) : (
-                    achievements.map((achievement, index) => (
+                    achievements.map((achievement) => (
                       <motion.div
-                        key={achievement._id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className={`flex items-center gap-4 p-3 rounded-xl transition-colors ${
-                          achievement.earnedAt
-                            ? "bg-green-50 border border-green-200"
-                            : "bg-muted/50 opacity-60"
+                        key={achievement.id}
+                        initial={false}
+                        animate={achievement.unlocked ? { scale: [1, 1.02, 1] } : {}}
+                        transition={{ duration: 0.4 }}
+                        className={`flex items-start gap-3 p-3 rounded-2xl transition-all ${
+                          achievement.unlocked
+                            ? `bg-gradient-to-r ${
+                                activeTab === "donors"
+                                  ? "from-emerald-50 to-teal-50 ring-1 ring-emerald-200/80"
+                                  : activeTab === "ngos"
+                                    ? "from-blue-50 to-indigo-50 ring-1 ring-blue-200/80"
+                                    : "from-violet-50 to-purple-50 ring-1 ring-violet-200/80"
+                              }`
+                            : "bg-slate-50/80"
                         }`}
                       >
+                        {/* Emoji badge */}
                         <div
-                          className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${
-                            achievement.earnedAt ? "bg-green-100" : "bg-muted"
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm ${
+                            achievement.unlocked
+                              ? "bg-white"
+                              : "bg-slate-100 grayscale opacity-50"
                           }`}
                         >
-                          {achievement.icon || "🏅"}
+                          {achievement.unlocked ? (
+                            achievement.emoji
+                          ) : (
+                            <Lock className="w-4 h-4 text-slate-400" />
+                          )}
                         </div>
-                        <div className="flex-1">
-                          <div
-                            className={`font-medium ${
-                              achievement.earnedAt
-                                ? "text-foreground"
-                                : "text-muted-foreground"
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-0.5">
+                            <p
+                              className={`text-xs font-bold truncate ${
+                                achievement.unlocked
+                                  ? "text-slate-800"
+                                  : "text-slate-400"
+                              }`}
+                            >
+                              {achievement.name}
+                            </p>
+                            {achievement.unlocked && (
+                              <span
+                                className={`flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${colors.badge}`}
+                              >
+                                ✓ Done
+                              </span>
+                            )}
+                          </div>
+                          <p
+                            className={`text-[10px] leading-tight mb-1.5 ${
+                              achievement.unlocked
+                                ? "text-muted-foreground"
+                                : "text-slate-400"
                             }`}
                           >
-                            {achievement.title}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
                             {achievement.description}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Progress
+                              value={achievement.progress}
+                              className={`h-1.5 flex-1 ${
+                                achievement.unlocked ? "" : "opacity-40"
+                              }`}
+                            />
+                            <span
+                              className={`text-[10px] font-semibold flex-shrink-0 ${
+                                achievement.unlocked
+                                  ? colors.accent
+                                  : "text-slate-400"
+                              }`}
+                            >
+                              {achievement.progressLabel}
+                            </span>
                           </div>
                         </div>
-                        {achievement.earnedAt && (
-                          <Badge className="bg-green-100 text-green-700">
-                            Unlocked
-                          </Badge>
-                        )}
                       </motion.div>
                     ))
                   )}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
+
+              {/* Tips Card */}
+              <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-400" />
+                <CardContent className="p-5">
+                  <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2 mb-3">
+                    💡 Tips to Climb
+                  </h4>
+                  <ul className="space-y-2 text-xs text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-3 h-3 mt-0.5 text-amber-500 flex-shrink-0" />
+                      <span>Complete donations regularly to earn steady points</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-3 h-3 mt-0.5 text-amber-500 flex-shrink-0" />
+                      <span>Unlock achievements for bonus recognition</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-3 h-3 mt-0.5 text-amber-500 flex-shrink-0" />
+                      <span>Higher quantity donations earn more points per action</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

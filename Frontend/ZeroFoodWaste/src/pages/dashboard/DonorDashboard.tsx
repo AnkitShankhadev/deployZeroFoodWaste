@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,10 +20,12 @@ import {
   Trophy,
   Star,
   Leaf,
+  Lock,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { buildDonorAchievements, useAchievementNotifications } from "@/hooks/useAchievements";
 
 type DonationStatus = "CREATED" | "ACCEPTED" | "ASSIGNED" | "DELIVERED" | "CANCELLED";
 
@@ -131,34 +133,43 @@ const DonorDashboard = () => {
     [donations]
   );
 
-  const achievements = [
-    { id: 1, name: "First Donation", icon: Star, unlocked: stats.completed >= 1 },
-    { id: 2, name: "10 Donations", icon: Trophy, unlocked: stats.completed >= 10 },
-    { id: 3, name: "Active Donor", icon: Award, unlocked: stats.active >= 3 },
-    { id: 4, name: "Impact Hero", icon: Leaf, unlocked: stats.totalQuantity >= 100 },
-  ];
+  const achievements = useMemo(
+    () => buildDonorAchievements(stats),
+    [stats]
+  );
+
+  // Fire toast notifications when new achievements unlock
+  useAchievementNotifications(achievements, user?.id);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f7f8f5]">
       <Navbar />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-20 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                Welcome back, {user?.name || "Donor"}! 👋
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Here's what's happening with your donations
-              </p>
+          {/* Hero Greeting Banner */}
+          <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-emerald-700 to-teal-600 shadow-xl">
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-luminosity"
+              style={{ backgroundImage: `url('https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&q=80&w=1600')` }}
+            />
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-8 md:p-10">
+              <div>
+                <p className="text-emerald-200 text-sm font-semibold uppercase tracking-widest mb-1">Donor Dashboard</p>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                  Welcome back, {user?.name?.split(' ')[0] || "Donor"} 👋
+                </h1>
+                <p className="text-emerald-100/80 mt-2 text-base">
+                  Here's what's happening with your donations
+                </p>
+              </div>
+              <Link to="/create-donation">
+                <Button size="lg" className="gap-2 bg-white text-emerald-700 font-bold hover:bg-emerald-50 rounded-full px-6 shadow-lg hover:-translate-y-0.5 transition-all">
+                  <Plus className="w-5 h-5" />
+                  New Donation
+                </Button>
+              </Link>
             </div>
-            <Link to="/create-donation">
-              <Button variant="hero" size="lg" className="gap-2">
-                <Plus className="w-5 h-5" />
-                New Donation
-              </Button>
-            </Link>
           </div>
 
           {/* Stats Grid */}
@@ -203,21 +214,24 @@ const DonorDashboard = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="border-border/50 hover:shadow-md transition-shadow">
+                <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-white overflow-hidden">
+                  <div className={`h-1 w-full ${stat.bg.replace('/10','').replace('bg-','bg-')} opacity-80`}
+                    style={{ background: stat.color.includes('primary') ? 'hsl(152 60% 32%)' : stat.color.includes('amber') ? '#d97706' : stat.color.includes('green') ? '#16a34a' : '#2563eb' }}
+                  />
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                           {stat.title}
                         </p>
-                        <p className="text-3xl font-bold text-foreground">
+                        <p className="text-4xl font-black text-slate-800 tracking-tight">
                           {stat.value}
                         </p>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-muted-foreground mt-1.5">
                           {stat.change}
                         </p>
                       </div>
-                      <div className={`p-3 rounded-xl ${stat.bg}`}>
+                      <div className={`p-3 rounded-2xl ${stat.bg}`}>
                         <stat.icon className={`w-6 h-6 ${stat.color}`} />
                       </div>
                     </div>
@@ -229,7 +243,7 @@ const DonorDashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Recent Donations */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-0">
               <Card className="border-border/50">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-xl">Recent Donations</CardTitle>
@@ -252,56 +266,61 @@ const DonorDashboard = () => {
                       You haven&apos;t created any donations yet. Create your first one to see it here.
                     </div>
                   ) : (
-                    <div className="divide-y divide-border">
+                    <div className="divide-y divide-slate-100">
                       {recentDonations.map((donation, index) => (
                         <motion.div
                           key={donation._id}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="p-4 hover:bg-muted/50 transition-colors"
+                          className="px-6 py-4 hover:bg-slate-50/80 transition-colors group"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-1">
-                                <h4 className="font-medium text-foreground">
-                                  {donation.foodType}
-                                </h4>
-                                <Badge
-                                  variant="outline"
-                                  className={
-                                    statusColors[
-                                      (donation.status as DonationStatus) || "PENDING"
-                                    ]
-                                  }
-                                >
-                                  {
-                                    statusLabels[
-                                      (donation.status as DonationStatus) || "PENDING"
-                                    ]
-                                  }
-                                </Badge>
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                                <Package className="w-5 h-5 text-emerald-600" />
                               </div>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Package className="w-4 h-4" />
-                                  {donation.quantity} {donation.unit || ""}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="w-4 h-4" />
-                                  {new Date(
-                                    donation.createdAt || donation.expiryDate
-                                  ).toLocaleDateString()}
-                                </span>
-                                {donation.acceptedBy?.name && (
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <h4 className="font-semibold text-slate-800 truncate">
+                                    {donation.foodType}
+                                  </h4>
+                                  <Badge
+                                    variant="outline"
+                                    className={`text-xs flex-shrink-0 ${
+                                      statusColors[
+                                        (donation.status as DonationStatus) || "PENDING"
+                                      ]
+                                    }`}
+                                  >
+                                    {
+                                      statusLabels[
+                                        (donation.status as DonationStatus) || "PENDING"
+                                      ]
+                                    }
+                                  </Badge>
+                                </div>
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                   <span className="flex items-center gap-1">
-                                    <MapPin className="w-4 h-4" />
-                                    {donation.acceptedBy.name}
+                                    <Package className="w-3 h-3" />
+                                    {donation.quantity} {donation.unit || ""}
                                   </span>
-                                )}
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" />
+                                    {new Date(
+                                      donation.createdAt || donation.expiryDate
+                                    ).toLocaleDateString()}
+                                  </span>
+                                  {donation.acceptedBy?.name && (
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="w-3 h-3" />
+                                      {donation.acceptedBy.name}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-emerald-600 transition-colors flex-shrink-0" />
                           </div>
                         </motion.div>
                       ))}
@@ -312,32 +331,30 @@ const DonorDashboard = () => {
             </div>
 
             {/* Achievements & Progress */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Level Progress */}
-              <Card className="border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-amber-500" />
+              <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-400" />
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-700">
+                    <Trophy className="w-4 h-4 text-amber-500" />
                     Your Progress
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center mb-4">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-green-600 text-white text-2xl font-bold mb-2">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white text-2xl font-black flex items-center justify-center shadow-lg flex-shrink-0">
                       {Math.max(1, Math.floor((user?.totalPoints ?? 0) / 100) + 1)}
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Level {Math.max(1, Math.floor((user?.totalPoints ?? 0) / 100) + 1)} Donor
-                    </p>
+                    <div>
+                      <p className="font-bold text-slate-800">Level {Math.max(1, Math.floor((user?.totalPoints ?? 0) / 100) + 1)} Donor</p>
+                      <p className="text-sm text-muted-foreground">{user?.totalPoints ?? 0} total points</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Progress to Level 13
-                      </span>
-                      <span className="font-medium">
-                        {(user?.totalPoints ?? 0) % 100}/100 pts
-                      </span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-medium text-muted-foreground">
+                      <span>Next level</span>
+                      <span>{(user?.totalPoints ?? 0) % 100}/100 pts</span>
                     </div>
                     <Progress value={((user?.totalPoints ?? 0) % 100)} className="h-2" />
                   </div>
@@ -345,75 +362,95 @@ const DonorDashboard = () => {
               </Card>
 
               {/* Achievements */}
-              <Card className="border-border/50">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-xl">Achievements</CardTitle>
+              <Card className="border-0 shadow-sm bg-white">
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
+                    <Trophy className="w-4 h-4 text-amber-500" />
+                    Achievements
+                    <span className="ml-1 inline-flex items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5">
+                      {achievements.filter(a => a.unlocked).length}/{achievements.length}
+                    </span>
+                  </CardTitle>
                   <Link to="/leaderboard">
-                    <Button variant="ghost" size="sm" className="gap-1">
-                      View all
-                      <ChevronRight className="w-4 h-4" />
+                    <Button variant="ghost" size="sm" className="gap-1 text-xs h-7">
+                      Leaderboard <ChevronRight className="w-3 h-3" />
                     </Button>
                   </Link>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-4 gap-3">
-                    {achievements.map((achievement) => (
-                      <div
-                        key={achievement.id}
-                        className={`flex flex-col items-center p-3 rounded-xl ${
-                          achievement.unlocked
-                            ? "bg-primary/10"
-                            : "bg-muted opacity-50"
-                        }`}
-                      >
-                        <achievement.icon
-                          className={`w-6 h-6 ${
-                            achievement.unlocked
-                              ? "text-primary"
-                              : "text-muted-foreground"
-                          }`}
-                        />
-                        <span className="text-xs text-center mt-1 text-muted-foreground">
-                          {achievement.name}
-                        </span>
+                <CardContent className="space-y-2.5 pt-0">
+                  {achievements.map((achievement) => (
+                    <motion.div
+                      key={achievement.id}
+                      initial={false}
+                      animate={achievement.unlocked ? { scale: [1, 1.02, 1] } : {}}
+                      transition={{ duration: 0.4 }}
+                      className={`relative flex items-start gap-3 p-3 rounded-2xl transition-all ${
+                        achievement.unlocked
+                          ? "bg-gradient-to-r from-emerald-50 to-teal-50 ring-1 ring-emerald-200/80"
+                          : "bg-slate-50/80"
+                      }`}
+                    >
+                      {/* Emoji badge */}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm ${
+                        achievement.unlocked ? "bg-white" : "bg-slate-100 grayscale opacity-50"
+                      }`}>
+                        {achievement.unlocked ? achievement.emoji : <Lock className="w-4 h-4 text-slate-400" />}
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-0.5">
+                          <p className={`text-xs font-bold truncate ${
+                            achievement.unlocked ? "text-slate-800" : "text-slate-400"
+                          }`}>
+                            {achievement.name}
+                          </p>
+                          {achievement.unlocked && (
+                            <span className="flex-shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-full">
+                              ✓ Done
+                            </span>
+                          )}
+                        </div>
+                        <p className={`text-[10px] leading-tight mb-1.5 ${
+                          achievement.unlocked ? "text-muted-foreground" : "text-slate-400"
+                        }`}>
+                          {achievement.description}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Progress
+                            value={achievement.progress}
+                            className={`h-1.5 flex-1 ${achievement.unlocked ? "" : "opacity-40"}`}
+                          />
+                          <span className={`text-[10px] font-semibold flex-shrink-0 ${
+                            achievement.unlocked ? "text-emerald-600" : "text-slate-400"
+                          }`}>
+                            {achievement.progressLabel}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </CardContent>
               </Card>
 
               {/* Quick Actions */}
-              <Card className="border-border/50 bg-gradient-to-br from-primary/5 to-primary/10">
-                <CardContent className="p-6">
-                  <h4 className="font-semibold text-foreground mb-4">
-                    Quick Actions
-                  </h4>
-                  <div className="space-y-3">
-                    <Link to="/donations/new" className="block">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start gap-2"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Create New Donation
+              <Card className="border-0 shadow-sm bg-white">
+                <CardContent className="p-5">
+                  <h4 className="text-sm font-bold text-slate-700 mb-3">Quick Actions</h4>
+                  <div className="space-y-2">
+                    <Link to="/create-donation" className="block">
+                      <Button variant="outline" className="w-full justify-start gap-2 h-10 text-sm hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition-all">
+                        <Plus className="w-4 h-4" /> Create Donation
                       </Button>
                     </Link>
                     <Link to="/map" className="block">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start gap-2"
-                      >
-                        <MapPin className="w-4 h-4" />
-                        View Nearby NGOs
+                      <Button variant="outline" className="w-full justify-start gap-2 h-10 text-sm hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition-all">
+                        <MapPin className="w-4 h-4" /> View Nearby NGOs
                       </Button>
                     </Link>
                     <Link to="/leaderboard" className="block">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start gap-2"
-                      >
-                        <Trophy className="w-4 h-4" />
-                        Check Leaderboard
+                      <Button variant="outline" className="w-full justify-start gap-2 h-10 text-sm hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 transition-all">
+                        <Trophy className="w-4 h-4" /> Check Leaderboard
                       </Button>
                     </Link>
                   </div>

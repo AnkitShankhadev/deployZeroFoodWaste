@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -18,10 +19,13 @@ import {
   Bell,
   Truck,
   Eye,
+  Lock,
+  Trophy,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { buildNGOAchievements, useAchievementNotifications } from "@/hooks/useAchievements";
 
 type DonationStatus =
   | "CREATED"
@@ -188,36 +192,49 @@ const NGODashboard = () => {
     return {
       collectedKg: totalCollectedKg,
       activePickups: acceptedDonations.length,
-      peopleFed: totalCollectedKg * 2, // rough estimate
+      peopleFed: totalCollectedKg * 2,
+      completedCount: completedDonations.length,
     };
   }, [acceptedDonations, completedDonations]);
+
+  const achievements = useMemo(
+    () => buildNGOAchievements({
+      collectedKg: stats.collectedKg,
+      activePickups: stats.activePickups,
+      completedCount: stats.completedCount,
+      peopleFed: stats.peopleFed,
+    }),
+    [stats]
+  );
+
+  useAchievementNotifications(achievements, user?.id);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f7f8f5]">
       <Navbar />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-20 pb-16">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-green-600 flex items-center justify-center">
-                <Building2 className="w-8 h-8 text-white" />
+          {/* Hero Greeting Banner */}
+          <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-blue-700 to-indigo-700 shadow-xl">
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-15"
+              style={{ backgroundImage: `url('https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=1600')` }}
+            />
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-8 md:p-10">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <p className="text-blue-200 text-sm font-semibold uppercase tracking-widest mb-1">NGO Dashboard</p>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">{user?.name || "Your NGO"}</h1>
+                  <p className="text-blue-100/80 mt-1 text-sm">{nearbyDonations.length} new donations available nearby</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">
-                  {user?.name || "Your NGO"}
-                </h1>
-                <p className="text-muted-foreground mt-1">
-                  {nearbyDonations.length} new donations available nearby
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-             
               <Link to="/map">
-                <Button variant="hero" size="lg" className="gap-2">
-                  <MapPin className="w-5 h-5" />
-                  View Map
+                <Button size="lg" className="gap-2 bg-white text-blue-700 font-bold hover:bg-blue-50 rounded-full px-6 shadow-lg hover:-translate-y-0.5 transition-all">
+                  <MapPin className="w-5 h-5" /> View Map
                 </Button>
               </Link>
             </div>
@@ -259,27 +276,17 @@ const NGODashboard = () => {
                 bg: "bg-green-100",
               },
             ].map((stat, index) => (
-              <motion.div
-                key={stat.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="border-border/50 hover:shadow-md transition-shadow">
+              <motion.div key={stat.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
+                <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-white overflow-hidden">
+                  <div style={{ background: stat.color.includes('primary') ? 'hsl(152 60% 32%)' : stat.color.includes('blue') ? '#2563eb' : stat.color.includes('purple') ? '#7c3aed' : '#16a34a' }} className="h-1 w-full" />
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          {stat.title}
-                        </p>
-                        <p className="text-3xl font-bold text-foreground">
-                          {stat.value}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {stat.change}
-                        </p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{stat.title}</p>
+                        <p className="text-4xl font-black text-slate-800 tracking-tight">{stat.value}</p>
+                        <p className="text-sm text-muted-foreground mt-1.5">{stat.change}</p>
                       </div>
-                      <div className={`p-3 rounded-xl ${stat.bg}`}>
+                      <div className={`p-3 rounded-2xl ${stat.bg}`}>
                         <stat.icon className={`w-6 h-6 ${stat.color}`} />
                       </div>
                     </div>
@@ -513,6 +520,61 @@ const NGODashboard = () => {
                       No completed collections yet.
                     </p>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Achievements */}
+            <Card className="border-0 shadow-sm bg-white lg:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-3">
+                <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-amber-500" />
+                  Achievements
+                  <span className="ml-1 inline-flex items-center justify-center rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5">
+                    {achievements.filter(a => a.unlocked).length}/{achievements.length}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                  {achievements.map((achievement) => (
+                    <motion.div
+                      key={achievement.id}
+                      initial={false}
+                      animate={achievement.unlocked ? { scale: [1, 1.02, 1] } : {}}
+                      transition={{ duration: 0.4 }}
+                      className={`flex items-start gap-3 p-3 rounded-2xl transition-all ${
+                        achievement.unlocked
+                          ? "bg-gradient-to-r from-blue-50 to-indigo-50 ring-1 ring-blue-200/80"
+                          : "bg-slate-50/80"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm ${
+                        achievement.unlocked ? "bg-white" : "bg-slate-100 grayscale opacity-50"
+                      }`}>
+                        {achievement.unlocked ? achievement.emoji : <Lock className="w-4 h-4 text-slate-400" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-0.5">
+                          <p className={`text-xs font-bold truncate ${achievement.unlocked ? "text-slate-800" : "text-slate-400"}`}>
+                            {achievement.name}
+                          </p>
+                          {achievement.unlocked && (
+                            <span className="flex-shrink-0 text-[10px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full">✓ Done</span>
+                          )}
+                        </div>
+                        <p className={`text-[10px] leading-tight mb-1.5 ${achievement.unlocked ? "text-muted-foreground" : "text-slate-400"}`}>
+                          {achievement.description}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Progress value={achievement.progress} className={`h-1.5 flex-1 ${achievement.unlocked ? "" : "opacity-40"}`} />
+                          <span className={`text-[10px] font-semibold flex-shrink-0 ${achievement.unlocked ? "text-blue-600" : "text-slate-400"}`}>
+                            {achievement.progressLabel}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

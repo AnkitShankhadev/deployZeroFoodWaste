@@ -14,6 +14,11 @@ export const CTA = () => {
           className="max-w-5xl mx-auto"
         >
           <div className="bg-emerald-900 rounded-[3rem] p-10 md:p-16 lg:p-20 shadow-2xl relative overflow-hidden">
+            {/* Photographic background */}
+            <div 
+              className="absolute inset-0 rounded-[3rem] bg-cover bg-center opacity-20"
+              style={{ backgroundImage: `url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80&w=1600')` }}
+            />
             {/* Organic decorative background elements */}
             <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-emerald-800/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
             <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-teal-800/40 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />

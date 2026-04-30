@@ -81,7 +81,7 @@ export function Stats() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center shadow-xl shadow-black/5 hover:bg-white/20 transition-colors">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center shadow-xl shadow-black/5 hover:bg-white/20 transition-all hover-lift">
                 <div className="flex justify-center mb-4">
                   <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow-inner">
                     <stat.icon className={`h-7 w-7 ${stat.iconColor}`} />

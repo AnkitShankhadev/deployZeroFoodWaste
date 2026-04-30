@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
-import heroImage from "@/assets/hero_food_donation.png";
 
 export const Hero = () => {
   const [stats, setStats] = useState({
@@ -117,11 +116,11 @@ export const Hero = () => {
             className="relative hidden lg:block"
           >
             <div className="relative pl-8">
-              <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-emerald-200/50 border-[8px] border-white z-10 w-full aspect-[4/3] transform transition-transform hover:scale-[1.02] duration-500">
+              <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-emerald-200/50 border-[8px] border-white z-10 w-full aspect-[4/3] hover-lift image-zoom-container">
                 <img 
-                  src={heroImage} 
+                  src="https://images.unsplash.com/photo-1593113565214-06cba6e850bd?auto=format&fit=crop&q=80&w=1200" 
                   alt="Volunteers sharing food" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover image-zoom"
                 />
               </div>
               
