@@ -8,115 +8,114 @@
 
 @layer base {
   :root {
-    --background: 45 33% 98%; /* Softer cream background */
-    --foreground: 160 30% 15%; /* Deep organic green-gray text */
+    --background: 38 11% 87%; /* #E2DFDA Pearl */
+    --foreground: 160 25% 31%; /* #3B6255 Forest Green */
 
-    --card: 0 0% 100%;
-    --card-foreground: 160 30% 15%;
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 160 25% 31%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 160 30% 15%;
+    --popover-foreground: 160 25% 31%;
 
-    --primary: 152 60% 32%; /* Rich organic green */
-    --primary-foreground: 0 0% 100%;
+    --primary: 160 25% 31%; /* #3B6255 Forest Green */
+    --primary-foreground: 38 11% 87%; /* #E2DFDA Pearl */
 
-    --secondary: 40 40% 92%; /* Warm soft sand */
-    --secondary-foreground: 152 60% 25%;
+    --secondary: 44 36% 72%; /* #D2C49E Sand */
+    --secondary-foreground: 160 25% 31%;
 
-    --muted: 45 20% 92%;
-    --muted-foreground: 160 20% 45%;
+    --muted: 145 21% 83%; /* #CBDED3 Light Mint */
+    --muted-foreground: 156 13% 59%; /* #8BA49A Sage */
 
-    --accent: 32 90% 55%; /* Warm amber accent */
+    --accent: 156 13% 59%; /* #8BA49A Sage */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 152 15% 85%;
-    --input: 152 15% 85%;
-    --ring: 152 60% 32%;
+    --border: 145 21% 83%; /* #CBDED3 */
+    --input: 145 21% 83%; /* #CBDED3 */
+    --ring: 160 25% 31%; /* #3B6255 */
 
-    --radius: 1rem; /* Slightly softer corners */
+    --radius: 1rem;
 
-    /* Custom tokens */
-    --green-50: 152 60% 96%;
-    --green-100: 152 50% 90%;
-    --green-200: 152 45% 80%;
-    --green-300: 152 50% 65%;
-    --green-400: 152 55% 48%;
-    --green-500: 152 60% 32%;
-    --green-600: 152 65% 26%;
-    --green-700: 152 70% 20%;
-    --green-800: 152 75% 15%;
-    --green-900: 152 80% 10%;
+    /* Custom tokens mapped to Earthy Harmony */
+    --green-50: 145 21% 95%;
+    --green-100: 145 21% 83%; /* #CBDED3 */
+    --green-200: 156 13% 70%;
+    --green-300: 156 13% 59%; /* #8BA49A */
+    --green-400: 160 25% 45%;
+    --green-500: 160 25% 31%; /* #3B6255 */
+    --green-600: 160 30% 25%;
+    --green-700: 160 35% 20%;
+    --green-800: 160 40% 15%;
+    --green-900: 160 45% 10%;
 
-    --amber-400: 38 92% 55%;
-    --amber-500: 38 92% 48%;
-    --amber-600: 32 95% 42%;
+    --amber-400: 44 36% 80%;
+    --amber-500: 44 36% 72%; /* #D2C49E */
+    --amber-600: 44 40% 60%;
 
-    --cream: 45 33% 98%;
-    --cream-dark: 45 25% 94%;
+    --cream: 38 11% 87%; /* #E2DFDA */
+    --cream-dark: 38 15% 80%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(152 60% 32%) 0%, hsl(145 55% 40%) 50%, hsl(160 65% 35%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(45 33% 98%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(38 92% 55%) 0%, hsl(32 95% 45%) 100%);
-    --gradient-soft: linear-gradient(180deg, hsl(152 60% 97%) 0%, hsl(45 33% 98%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(160 25% 31%) 0%, hsl(156 13% 59%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(38 11% 87%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(44 36% 72%) 0%, hsl(156 13% 59%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(145 21% 83%) 0%, hsl(38 11% 87%) 100%);
 
-    /* Shadows - More natural, layered feel */
-    --shadow-sm: 0 2px 4px rgba(20, 50, 35, 0.04);
-    --shadow-md: 0 4px 12px rgba(20, 50, 35, 0.06), 0 2px 4px rgba(20, 50, 35, 0.04);
-    --shadow-lg: 0 12px 24px rgba(20, 50, 35, 0.08), 0 4px 8px rgba(20, 50, 35, 0.04);
-    --shadow-xl: 0 24px 48px rgba(20, 50, 35, 0.1), 0 8px 16px rgba(20, 50, 35, 0.04);
-    --shadow-glow: 0 0 40px hsl(152 60% 32% / 0.15);
+    --shadow-sm: 0 2px 4px rgba(59, 98, 85, 0.05);
+    --shadow-md: 0 4px 12px rgba(59, 98, 85, 0.08), 0 2px 4px rgba(59, 98, 85, 0.04);
+    --shadow-lg: 0 12px 24px rgba(59, 98, 85, 0.12), 0 4px 8px rgba(59, 98, 85, 0.06);
+    --shadow-xl: 0 24px 48px rgba(59, 98, 85, 0.15), 0 8px 16px rgba(59, 98, 85, 0.08);
+    --shadow-glow: 0 0 40px hsl(160 25% 31% / 0.15);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 152 60% 32%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 152 40% 95%;
-    --sidebar-accent-foreground: 152 60% 25%;
-    --sidebar-border: 152 20% 90%;
-    --sidebar-ring: 152 60% 32%;
+    --sidebar-background: 38 11% 87%;
+    --sidebar-foreground: 160 25% 31%;
+    --sidebar-primary: 160 25% 31%;
+    --sidebar-primary-foreground: 38 11% 87%;
+    --sidebar-accent: 145 21% 83%;
+    --sidebar-accent-foreground: 160 25% 31%;
+    --sidebar-border: 145 21% 83%;
+    --sidebar-ring: 160 25% 31%;
   }
 
   .dark {
-    --background: 160 25% 8%; /* Rich deep forest background */
-    --foreground: 45 20% 95%;
+    --background: 160 30% 12%; /* Deep forest background */
+    --foreground: 38 11% 87%; /* #E2DFDA */
 
-    --card: 160 20% 12%;
-    --card-foreground: 45 20% 95%;
+    --card: 160 25% 15%;
+    --card-foreground: 38 11% 87%;
 
-    --popover: 160 20% 12%;
-    --popover-foreground: 45 20% 95%;
+    --popover: 160 25% 15%;
+    --popover-foreground: 38 11% 87%;
 
-    --primary: 152 55% 45%;
+    --primary: 156 13% 59%; /* #8BA49A Sage */
     --primary-foreground: 160 30% 10%;
 
-    --secondary: 160 15% 18%;
-    --secondary-foreground: 152 40% 85%;
+    --secondary: 160 20% 20%;
+    --secondary-foreground: 145 21% 83%;
 
-    --muted: 160 15% 18%;
-    --muted-foreground: 160 10% 65%;
+    --muted: 160 20% 20%;
+    --muted-foreground: 156 13% 59%;
 
-    --accent: 38 90% 55%;
+    --accent: 44 36% 72%; /* #D2C49E Sand */
     --accent-foreground: 160 30% 10%;
 
     --destructive: 0 62% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 160 15% 20%;
-    --input: 160 15% 20%;
-    --ring: 152 55% 45%;
+    --border: 160 20% 25%;
+    --input: 160 20% 25%;
+    --ring: 156 13% 59%;
 
-    --sidebar-background: 160 25% 10%;
-    --sidebar-foreground: 45 20% 90%;
-    --sidebar-primary: 152 55% 45%;
+    --sidebar-background: 160 30% 10%;
+    --sidebar-foreground: 38 11% 87%;
+    --sidebar-primary: 156 13% 59%;
     --sidebar-primary-foreground: 160 30% 10%;
-    --sidebar-accent: 160 20% 15%;
-    --sidebar-accent-foreground: 152 40% 85%;
-    --sidebar-border: 160 15% 20%;
-    --sidebar-ring: 152 55% 45%;
+    --sidebar-accent: 160 25% 15%;
+    --sidebar-accent-foreground: 145 21% 83%;
+    --sidebar-border: 160 20% 25%;
+    --sidebar-ring: 156 13% 59%;
   }
 }
 

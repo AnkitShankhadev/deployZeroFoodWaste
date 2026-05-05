@@ -76,9 +76,7 @@ export const Footer = () => {
           <p className="text-green-400 text-sm">
             © 2024 ZeroFoodWaste. All rights reserved.
           </p>
-          <p className="text-green-400 text-sm flex items-center gap-1">
-            Made with <Heart className="w-4 h-4 text-red-400 fill-red-400" /> for a sustainable future
-          </p>
+
         </div>
       </div>
     </footer>

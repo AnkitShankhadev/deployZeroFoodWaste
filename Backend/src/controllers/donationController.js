@@ -59,7 +59,7 @@ exports.getAllDonations = async (req, res, next) => {
     if (donorId) query.donorId = donorId;
 
     const donations = await FoodDonation.find(query)
-      .populate("donorId", "name email location")
+      .populate("donorId", "name email location profileImage")
       .populate("acceptedBy", "name email")
       .populate("assignedVolunteer", "name email")
       .limit(limit * 1)
@@ -90,7 +90,7 @@ exports.getAllDonations = async (req, res, next) => {
 exports.getDonation = async (req, res, next) => {
   try {
     const donation = await FoodDonation.findById(req.params.id)
-      .populate("donorId", "name email location phone")
+      .populate("donorId", "name email location phone profileImage")
       .populate("acceptedBy", "name email location")
       .populate("assignedVolunteer", "name email location");
 
@@ -425,7 +425,7 @@ exports.getDonationLocations = async (req, res, next) => {
       "location.lng": { $exists: true },
     })
       .select("foodType quantity quantityUnit expiryDate description status location donorId")
-      .populate("donorId", "name")
+      .populate("donorId", "name profileImage")
       .lean();
 
     const locations = donations.map((d) => ({

@@ -293,15 +293,15 @@ const VolunteerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f8f5]">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       <main className="pt-20 pb-16">
         <div className="container mx-auto px-4">
           {/* Hero Greeting Banner */}
-          <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-violet-700 to-purple-700 shadow-xl">
+          <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-primary to-accent shadow-xl">
             <div
-              className="absolute inset-0 bg-cover bg-center opacity-15"
+              className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-luminosity"
               style={{ backgroundImage: `url('https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&q=80&w=1600')` }}
             />
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-8 md:p-10">
@@ -310,22 +310,22 @@ const VolunteerDashboard = () => {
                   <Bike className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <p className="text-violet-200 text-sm font-semibold uppercase tracking-widest mb-1">Volunteer Dashboard</p>
-                  <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-                    Hey, {user?.name?.split(' ')[0] || "Volunteer"} 🚴
+                  <p className="text-primary-foreground/80 text-sm font-semibold uppercase tracking-widest mb-1">Volunteer Dashboard</p>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground tracking-tight">
+                    Hey, {user?.name?.split(' ')[0] || "Volunteer"}
                   </h1>
-                  <p className="text-violet-100/80 mt-1 text-sm">
+                  <p className="text-primary-foreground/60 mt-1 text-sm">
                     {currentTask ? "You have an active delivery" : "No active deliveries right now"}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <p className="text-violet-200 text-xs font-semibold uppercase tracking-wider">Today's Earnings</p>
-                  <p className="text-3xl font-black text-white">{stats.deliveriesToday * 50} pts</p>
+                  <p className="text-primary-foreground/80 text-xs font-semibold uppercase tracking-wider">Today's Earnings</p>
+                  <p className="text-3xl font-black text-primary-foreground">{stats.deliveriesToday * 50} pts</p>
                 </div>
                 <Link to="/map">
-                  <Button size="lg" className="gap-2 bg-white text-violet-700 font-bold hover:bg-violet-50 rounded-full px-6 shadow-lg hover:-translate-y-0.5 transition-all">
+                  <Button size="lg" className="gap-2 bg-secondary text-secondary-foreground font-bold hover:bg-secondary/80 rounded-full px-6 shadow-lg hover:-translate-y-0.5 transition-all">
                     <Navigation className="w-5 h-5" /> Open Map
                   </Button>
                 </Link>
@@ -362,18 +362,15 @@ const VolunteerDashboard = () => {
               },
             ].map((stat, index) => (
               <motion.div key={stat.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
-                <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-white overflow-hidden">
-                  <div style={{ background: stat.color.includes('primary') ? 'hsl(152 60% 32%)' : stat.color.includes('green') ? '#16a34a' : '#d97706' }} className="h-1 w-full" />
+                <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 bg-card overflow-hidden">
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{stat.title}</p>
-                        <p className="text-4xl font-black text-slate-800 tracking-tight">{stat.value}</p>
+                        <p className="text-4xl font-black text-foreground tracking-tight">{stat.value}</p>
                         <p className="text-sm text-muted-foreground mt-1.5">{stat.change}</p>
                       </div>
-                      <div className={`p-3 rounded-2xl ${stat.bg}`}>
-                        <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                      </div>
+
                     </div>
                   </CardContent>
                 </Card>
@@ -384,15 +381,14 @@ const VolunteerDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Current Task */}
             <div className="lg:col-span-2">
-              <Card className="border-0 shadow-sm bg-white overflow-hidden">
-                <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-600" />
+              <Card className="border-border shadow-sm bg-card overflow-hidden">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-800">
-                      <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse" />
+                    <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
+                      <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
                       Active Delivery
                     </CardTitle>
-                    <Badge className="bg-violet-100 text-violet-700 border-violet-200 font-semibold text-xs">
+                    <Badge className="bg-primary/20 text-primary border-primary/30 font-semibold text-xs">
                       {currentTask ? currentTask.status.replace("_", " ") : "None"}
                     </Badge>
                   </div>
@@ -404,22 +400,22 @@ const VolunteerDashboard = () => {
                     <div className="text-center py-8"><p className="text-sm text-destructive">{error}</p></div>
                   ) : !currentTask ? (
                     <div className="text-center py-10">
-                      <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
-                        <Bike className="w-8 h-8 text-slate-400" />
+                      <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-3 border border-border">
+                        <Bike className="w-8 h-8 text-muted-foreground" />
                       </div>
-                      <p className="text-sm font-medium text-slate-500">No active delivery right now</p>
+                      <p className="text-sm font-medium text-foreground">No active delivery right now</p>
                       <p className="text-xs text-muted-foreground mt-1">Check available tasks below</p>
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center justify-between bg-slate-50 rounded-2xl px-4 py-3">
+                      <div className="flex items-center justify-between bg-muted rounded-2xl px-4 py-3">
                         <div>
-                          <h3 className="text-lg font-bold text-slate-800">{currentTask.donationId.foodType}</h3>
+                          <h3 className="text-lg font-bold text-foreground">{currentTask.donationId.foodType}</h3>
                           <p className="text-sm text-muted-foreground">{currentTask.donationId.quantity}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Assigned at</p>
-                          <p className="text-base font-bold text-violet-600">
+                          <p className="text-base font-bold text-primary">
                             {new Date(currentTask.assignedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </p>
                         </div>
@@ -435,36 +431,36 @@ const VolunteerDashboard = () => {
                             </div>
                             <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Pickup</span>
                           </div>
-                          <h4 className="font-semibold text-slate-800 text-sm">{currentTask.donationId.donorId?.name || "Donor"}</h4>
+                          <h4 className="font-semibold text-foreground text-sm">{currentTask.donationId.donorId?.name || "Donor"}</h4>
                           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                             {currentTask.donationId.donorId?.location?.address || currentTask.donationId.donorId?.address || "Address not available"}
                           </p>
                           {currentTask.donationId.donorId?.phone && (
-                            <a href={`tel:${currentTask.donationId.donorId.phone}`} className="inline-flex items-center gap-1 text-xs text-violet-600 mt-2 hover:underline font-medium">
+                            <a href={`tel:${currentTask.donationId.donorId.phone}`} className="inline-flex items-center gap-1 text-xs text-primary mt-2 hover:underline font-medium">
                               <Phone className="w-3 h-3" />{currentTask.donationId.donorId.phone}
                             </a>
                           )}
                         </div>
                         {/* Arrow */}
                         <div className="flex items-center justify-center px-1">
-                          <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center">
-                            <ArrowRight className="w-4 h-4 text-slate-500" />
+                          <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+                            <ArrowRight className="w-4 h-4 text-muted-foreground" />
                           </div>
                         </div>
                         {/* Dropoff */}
-                        <div className="flex-1 p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                        <div className="flex-1 p-4 rounded-2xl bg-secondary/20 border border-secondary/30">
                           <div className="flex items-center gap-2 mb-2">
-                            <div className="w-7 h-7 rounded-xl bg-emerald-500 flex items-center justify-center">
-                              <Building2 className="w-3.5 h-3.5 text-white" />
+                            <div className="w-7 h-7 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center">
+                              <Building2 className="w-3.5 h-3.5" />
                             </div>
-                            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Drop-off</span>
+                            <span className="text-xs font-bold text-secondary-foreground uppercase tracking-wider">Drop-off</span>
                           </div>
-                          <h4 className="font-semibold text-slate-800 text-sm">{currentTask.donationId.acceptedBy?.name || "NGO"}</h4>
+                          <h4 className="font-semibold text-foreground text-sm">{currentTask.donationId.acceptedBy?.name || "NGO"}</h4>
                           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                             {currentTask.donationId.acceptedBy?.location?.address || "Address not available"}
                           </p>
                           {currentTask.donationId.acceptedBy?.phone && (
-                            <a href={`tel:${currentTask.donationId.acceptedBy.phone}`} className="inline-flex items-center gap-1 text-xs text-violet-600 mt-2 hover:underline font-medium">
+                            <a href={`tel:${currentTask.donationId.acceptedBy.phone}`} className="inline-flex items-center gap-1 text-xs text-primary mt-2 hover:underline font-medium">
                               <Phone className="w-3 h-3" />{currentTask.donationId.acceptedBy.phone}
                             </a>
                           )}
@@ -472,7 +468,7 @@ const VolunteerDashboard = () => {
                       </div>
 
                       <div className="flex gap-3 pt-1">
-                        <Button variant="outline" className="flex-1 gap-2 rounded-xl h-11 border-slate-200 hover:border-violet-300 hover:text-violet-700 hover:bg-violet-50 transition-all">
+                        <Button variant="outline" className="flex-1 gap-2 rounded-xl h-11 border-border hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all">
                           <Navigation className="w-4 h-4" />Navigate
                         </Button>
                         {currentTask.status === "PENDING" ? (
@@ -480,7 +476,7 @@ const VolunteerDashboard = () => {
                             {isMarkingPickedUp ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Picking up...</> : <><CheckCircle className="w-4 h-4" />Mark as Picked Up</>}
                           </Button>
                         ) : (
-                          <Button className="flex-1 gap-2 rounded-xl h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold" onClick={handleMarkCompleted} disabled={isMarkingCompleted}>
+                          <Button className="flex-1 gap-2 rounded-xl h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold border-2 border-primary" onClick={handleMarkCompleted} disabled={isMarkingCompleted}>
                             {isMarkingCompleted ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Completing...</> : <><CheckCircle className="w-4 h-4" />Mark as Completed</>}
                           </Button>
                         )}
@@ -494,17 +490,16 @@ const VolunteerDashboard = () => {
             {/* Progress & Stats */}
             <div className="space-y-5">
               {/* Daily Progress */}
-              <Card className="border-0 shadow-sm bg-white overflow-hidden">
-                <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-400" />
+              <Card className="border-border shadow-sm bg-card overflow-hidden">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-700">
+                  <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
                     <Star className="w-4 h-4 text-amber-500" />
                     Daily Goal
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-end gap-2 mb-3">
-                    <p className="text-5xl font-black text-slate-800 tracking-tight">{stats.deliveriesToday}</p>
+                    <p className="text-5xl font-black text-foreground tracking-tight">{stats.deliveriesToday}</p>
                     <p className="text-2xl font-bold text-muted-foreground mb-1">/5</p>
                   </div>
                   <Progress value={Math.min(100, (stats.deliveriesToday / 5) * 100)} className="h-2.5 mb-3" />
@@ -514,10 +509,10 @@ const VolunteerDashboard = () => {
                 </CardContent>
               </Card>
               {/* Completed Today */}
-              <Card className="border-0 shadow-sm bg-white">
+              <Card className="border-border shadow-sm bg-card">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-700">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
+                    <CheckCircle className="w-4 h-4 text-primary" />
                     Completed Today
                   </CardTitle>
                 </CardHeader>
@@ -526,17 +521,17 @@ const VolunteerDashboard = () => {
                     <p className="text-xs text-muted-foreground text-center py-3">No deliveries yet today</p>
                   ) : (
                     completedToday.map((task) => (
-                      <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                      <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-lg">
+                          <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center text-lg">
                             {foodTypeEmojis[task.title] || "🍽️"}
                           </div>
                           <div>
-                            <p className="font-semibold text-slate-800 text-sm">{task.title}</p>
+                            <p className="font-semibold text-foreground text-sm">{task.title}</p>
                             <p className="text-xs text-muted-foreground">{task.quantity} kg</p>
                           </div>
                         </div>
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 font-bold text-xs">+{task.points} pts</Badge>
+                        <Badge variant="secondary" className="bg-primary/20 text-primary font-bold text-xs">+{task.points} pts</Badge>
                       </div>
                     ))
                   )}
@@ -545,14 +540,14 @@ const VolunteerDashboard = () => {
             </div>
 
             {/* Available Tasks */}
-            <Card className="border-0 shadow-sm bg-white lg:col-span-3">
+            <Card className="border-border shadow-sm bg-card lg:col-span-3">
               <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-800">
+                <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
                   <Clock className="w-5 h-5 text-amber-500" />
                   Available Tasks from NGOs
                 </CardTitle>
                 <Link to="/map">
-                  <Button variant="ghost" size="sm" className="gap-1 text-xs h-7 text-muted-foreground hover:text-violet-600">
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs h-7 text-muted-foreground hover:text-primary">
                     View on map <ChevronRight className="w-3 h-3" />
                   </Button>
                 </Link>
@@ -564,8 +559,8 @@ const VolunteerDashboard = () => {
                   <div className="text-center py-8"><p className="text-sm text-destructive">{taskError}</p></div>
                 ) : availableTasks.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
-                      <Clock className="w-7 h-7 text-slate-400" />
+                    <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-3 border border-border">
+                      <Clock className="w-7 h-7 text-muted-foreground" />
                     </div>
                     <p className="text-sm text-muted-foreground">No available tasks right now. Check back soon!</p>
                   </div>
@@ -577,14 +572,14 @@ const VolunteerDashboard = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.08 }}
-                        className="p-4 rounded-2xl border border-slate-200 bg-[#fafaf8] hover:border-violet-300 hover:shadow-md transition-all"
+                        className="p-4 rounded-2xl border border-border bg-muted/30 hover:border-primary/40 hover:shadow-md transition-all"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h4 className="font-bold text-slate-800 text-sm">{task.foodType}</h4>
+                            <h4 className="font-bold text-foreground text-sm">{task.foodType}</h4>
                             <p className="text-xs text-muted-foreground">{task.quantity}</p>
                           </div>
-                          <Badge variant="secondary" className="bg-violet-100 text-violet-700 font-bold text-xs">+50 pts</Badge>
+                          <Badge variant="secondary" className="bg-primary/20 text-primary font-bold text-xs">+50 pts</Badge>
                         </div>
                         <div className="space-y-2 text-sm text-muted-foreground mb-4">
                           <p className="flex items-center gap-2">
@@ -620,14 +615,14 @@ const VolunteerDashboard = () => {
                         </div>
                         <Button
                           variant="outline"
-                          className="w-full"
+                          className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground border-secondary font-bold border-2"
                           size="sm"
                           onClick={() => handleAcceptTask(task._id)}
                           disabled={isAcceptingTask}
                         >
                           {isAcceptingTask ? (
                             <>
-                              <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2" />
+                              <div className="w-3 h-3 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin mr-2" />
                               Accepting...
                             </>
                           ) : (
@@ -642,12 +637,12 @@ const VolunteerDashboard = () => {
             </Card>
 
             {/* Achievements */}
-            <Card className="border-0 shadow-sm bg-white lg:col-span-3">
+            <Card className="border-border shadow-sm bg-card lg:col-span-3">
               <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-base font-bold text-slate-700 flex items-center gap-2">
+                <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-amber-500" />
                   Achievements
-                  <span className="ml-1 inline-flex items-center justify-center rounded-full bg-violet-100 text-violet-700 text-[10px] font-bold px-2 py-0.5">
+                  <span className="ml-1 inline-flex items-center justify-center rounded-full bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5">
                     {achievements.filter(a => a.unlocked).length}/{achievements.length}
                   </span>
                 </CardTitle>
@@ -660,32 +655,30 @@ const VolunteerDashboard = () => {
                       initial={false}
                       animate={achievement.unlocked ? { scale: [1, 1.02, 1] } : {}}
                       transition={{ duration: 0.4 }}
-                      className={`flex items-start gap-3 p-3 rounded-2xl transition-all ${
-                        achievement.unlocked
-                          ? "bg-gradient-to-r from-violet-50 to-purple-50 ring-1 ring-violet-200/80"
-                          : "bg-slate-50/80"
-                      }`}
+                      className={`flex items-start gap-3 p-3 rounded-2xl transition-all ${achievement.unlocked
+                        ? "bg-gradient-to-r from-primary/5 to-accent/5 ring-1 ring-primary/40"
+                        : "bg-muted/50"
+                        }`}
                     >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm ${
-                        achievement.unlocked ? "bg-white" : "bg-slate-100 grayscale opacity-50"
-                      }`}>
-                        {achievement.unlocked ? achievement.emoji : <Lock className="w-4 h-4 text-slate-400" />}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm ${achievement.unlocked ? "bg-card border border-border" : "bg-muted grayscale opacity-50 border border-border"
+                        }`}>
+                        {achievement.unlocked ? achievement.emoji : <Lock className="w-4 h-4 text-muted-foreground" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <p className={`text-xs font-bold truncate ${achievement.unlocked ? "text-slate-800" : "text-slate-400"}`}>
+                          <p className={`text-xs font-bold truncate ${achievement.unlocked ? "text-foreground" : "text-muted-foreground"}`}>
                             {achievement.name}
                           </p>
                           {achievement.unlocked && (
-                            <span className="flex-shrink-0 text-[10px] font-bold text-violet-600 bg-violet-100 px-1.5 py-0.5 rounded-full">✓ Done</span>
+                            <span className="flex-shrink-0 text-[10px] font-bold text-primary bg-primary/20 px-1.5 py-0.5 rounded-full">✓ Done</span>
                           )}
                         </div>
-                        <p className={`text-[10px] leading-tight mb-1.5 ${achievement.unlocked ? "text-muted-foreground" : "text-slate-400"}`}>
+                        <p className={`text-[10px] leading-tight mb-1.5 ${achievement.unlocked ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
                           {achievement.description}
                         </p>
                         <div className="flex items-center gap-2">
                           <Progress value={achievement.progress} className={`h-1.5 flex-1 ${achievement.unlocked ? "" : "opacity-40"}`} />
-                          <span className={`text-[10px] font-semibold flex-shrink-0 ${achievement.unlocked ? "text-violet-600" : "text-slate-400"}`}>
+                          <span className={`text-[10px] font-semibold flex-shrink-0 ${achievement.unlocked ? "text-primary" : "text-muted-foreground"}`}>
                             {achievement.progressLabel}
                           </span>
                         </div>

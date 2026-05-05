@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Scale, Users, Building2, Leaf } from "lucide-react";
 import { api } from "@/lib/api";
 
 export function Stats() {
@@ -26,70 +25,71 @@ export function Stats() {
 
   const displayStats = [
     {
-      icon: Scale,
+      image: "https://images.unsplash.com/photo-1593113565214-80afcb4d4d6b?auto=format&fit=crop&q=80&w=600",
       value: stats.completedDonations > 0 ? `${(stats.completedDonations * 3).toLocaleString()}kg` : "0",
       label: "Food Saved",
       detail: "From going to waste",
-      iconColor: "text-emerald-500"
     },
     {
-      icon: Users,
+      image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80&w=600",
       value: stats.totalDonors > 0 ? `${stats.totalDonors.toLocaleString()}+` : "0",
       label: "Active Users",
       detail: "Donors & volunteers",
-      iconColor: "text-emerald-500"
     },
     {
-      icon: Building2,
+      image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=600",
       value: stats.totalNGOs > 0 ? `${stats.totalNGOs.toLocaleString()}+` : "0",
       label: "NGO Partners",
       detail: "Local partners",
-      iconColor: "text-emerald-500"
     },
-
   ];
 
   return (
-    <section className="py-20 bg-emerald-600 text-white relative overflow-hidden font-sans">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)`
-        }}></div>
+    <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden font-sans">
+      {/* Background Elements */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&q=80&w=2000" 
+          alt="Background" 
+          className="w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-primary/80 to-primary"></div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 relative z-10 max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-white tracking-tight">Our Impact in Numbers</h2>
-          <p className="text-lg text-emerald-50 max-w-2xl mx-auto font-medium">
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-primary-foreground tracking-tight">Our Impact in Numbers</h2>
+          <p className="text-lg md:text-xl text-primary-foreground/80 max-w-3xl mx-auto font-medium">
             Together, our community is making a real difference in fighting food waste and hunger.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {displayStats.map((stat, index) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
+              transition={{ delay: index * 0.2, duration: 0.6 }}
             >
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center shadow-xl shadow-black/5 hover:bg-white/20 transition-all hover-lift">
-                <div className="flex justify-center mb-4">
-                  <div className="h-14 w-14 bg-white rounded-full flex items-center justify-center shadow-inner">
-                    <stat.icon className={`h-7 w-7 ${stat.iconColor}`} />
-                  </div>
+              <div className="group relative bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden text-center shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/20 hover:border-white/30 hover:shadow-black/20">
+                <div className="h-48 w-full overflow-hidden relative">
+                   <div className="absolute inset-0 bg-black/10 z-10 group-hover:bg-transparent transition-colors duration-300"></div>
+                   <img src={stat.image} alt={stat.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" />
+                   <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/40 to-transparent z-10"></div>
                 </div>
-                <div className="text-3xl md:text-4xl font-extrabold mb-2 text-white">{stat.value}</div>
-                <div className="text-sm font-bold mb-1 text-emerald-50 uppercase tracking-wider">{stat.label}</div>
-                <div className="text-xs text-white/80 font-medium">{stat.detail}</div>
+                <div className="p-8 relative z-20 -mt-8 bg-gradient-to-b from-transparent to-black/20">
+                  <div className="text-4xl md:text-5xl font-black mb-3 text-white drop-shadow-lg tracking-tight group-hover:text-white transition-colors">{stat.value}</div>
+                  <div className="text-sm font-bold mb-2 text-primary-foreground/80 uppercase tracking-widest">{stat.label}</div>
+                  <div className="text-sm text-primary-foreground/60 font-medium">{stat.detail}</div>
+                </div>
               </div>
             </motion.div>
           ))}

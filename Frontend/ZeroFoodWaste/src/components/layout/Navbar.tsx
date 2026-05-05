@@ -98,16 +98,14 @@ export const Navbar = () => {
               return (
                 <Link key={link.href} to={link.href} className="group relative py-2">
                   <span
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isActive ? "text-primary font-semibold" : "text-foreground/80 hover:text-primary"
-                    }`}
+                    className={`text-sm font-medium transition-colors duration-300 ${isActive ? "text-primary font-semibold" : "text-foreground/80 hover:text-primary"
+                      }`}
                   >
                     {link.label}
                   </span>
                   <span
-                    className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-300 ${
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
+                    className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
                   />
                 </Link>
               );
@@ -192,9 +190,8 @@ export const Navbar = () => {
                     >
                       <Button
                         variant={isActive ? "soft" : "ghost"}
-                        className={`w-full justify-start transition-all duration-300 ${
-                          isActive ? "text-primary pl-6 border-l-2 border-primary rounded-l-none" : "hover:pl-6 hover:text-primary"
-                        }`}
+                        className={`w-full justify-start transition-all duration-300 ${isActive ? "text-primary pl-6 border-l-2 border-primary rounded-l-none" : "hover:pl-6 hover:text-primary"
+                          }`}
                       >
                         {link.label}
                       </Button>

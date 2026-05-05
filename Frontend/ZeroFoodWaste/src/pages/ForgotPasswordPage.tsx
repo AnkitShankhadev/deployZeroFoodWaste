@@ -116,7 +116,7 @@ const ForgotPasswordPage = () => {
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-green-900">
         {/* Photographic Background */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center z-0 mix-blend-overlay opacity-60"
           style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200')` }}
         />
@@ -146,25 +146,8 @@ const ForgotPasswordPage = () => {
             </p>
           </div>
 
-          {/* Decorative elements */}
-          <div className="space-y-6">
-            {[
-              { icon: "🔒", text: "Secure password reset process" },
-              { icon: "📧", text: "Reset link sent to your email" },
-              { icon: "⚡", text: "Quick and easy recovery" },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-                className="flex items-center gap-4"
-              >
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-lg text-green-100">{item.text}</span>
-              </motion.div>
-            ))}
-          </div>
+
+
         </div>
       </div>
 

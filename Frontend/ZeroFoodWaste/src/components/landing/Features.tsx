@@ -24,7 +24,7 @@ const features = [
 
 export const Features = () => {
   return (
-    <section className="py-24 bg-slate-50 relative overflow-hidden font-sans">
+    <section className="py-24 bg-background relative overflow-hidden font-sans">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -32,15 +32,12 @@ export const Features = () => {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="inline-block px-5 py-2 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold mb-4">
-            Features
 
-          </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6 tracking-tight">
             Everything You Need to{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600">Make an Impact</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Make an Impact</span>
           </h2>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
             A comprehensive platform designed to make food donation simple,
             rewarding, and impactful for everyone involved in the community.
           </p>
@@ -56,7 +53,7 @@ export const Features = () => {
                 transition={{ duration: 0.6 }}
                 className="w-full md:w-1/2"
               >
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-emerald-100/50 border-8 border-white hover-lift image-zoom-container group">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border-8 border-card hover-lift image-zoom-container group">
                   <img src={feature.image} alt={feature.title} className="w-full h-80 object-cover image-zoom" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                 </div>
@@ -69,15 +66,15 @@ export const Features = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="w-full md:w-1/2 space-y-6"
               >
-                <h3 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">{feature.title}</h3>
-                <p className="text-lg text-slate-600 leading-relaxed font-medium">
+                <h3 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">{feature.title}</h3>
+                <p className="text-lg text-muted-foreground leading-relaxed font-medium">
                   {feature.description}
                 </p>
                 <ul className="space-y-4 pt-4">
                   {feature.benefits.map((benefit) => (
-                    <li key={benefit} className="flex items-center gap-3 text-slate-700 font-semibold text-lg">
-                      <div className="p-1 rounded-full bg-emerald-100">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    <li key={benefit} className="flex items-center gap-3 text-foreground/80 font-semibold text-lg">
+                      <div className="p-1 rounded-full bg-primary/20">
+                        <CheckCircle2 className="w-5 h-5 text-primary" />
                       </div>
                       {benefit}
                     </li>
