@@ -20,7 +20,6 @@ import {
   Phone,
   Building2,
   ArrowRight,
-  Timer,
   Lock,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";

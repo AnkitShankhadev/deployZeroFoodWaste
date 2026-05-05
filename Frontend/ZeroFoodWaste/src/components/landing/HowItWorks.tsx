@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Camera, MapPin, Truck, Heart } from "lucide-react";
+
 
 const steps = [
   {

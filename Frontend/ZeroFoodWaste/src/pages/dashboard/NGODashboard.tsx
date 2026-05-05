@@ -11,12 +11,10 @@ import {
   Building2,
   Package,
   Users,
-  TrendingUp,
   Clock,
   CheckCircle,
   MapPin,
   ChevronRight,
-  Bell,
   Truck,
   Eye,
   Lock,
@@ -536,8 +534,8 @@ const NGODashboard = () => {
                       animate={achievement.unlocked ? { scale: [1, 1.02, 1] } : {}}
                       transition={{ duration: 0.4 }}
                       className={`flex items-start gap-3 p-3 rounded-2xl transition-all ${achievement.unlocked
-                          ? "bg-gradient-to-r from-primary/5 to-accent/5 ring-1 ring-primary/40"
-                          : "bg-muted/50"
+                        ? "bg-gradient-to-r from-primary/5 to-accent/5 ring-1 ring-primary/40"
+                        : "bg-muted/50"
                         }`}
                     >
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 shadow-sm ${achievement.unlocked ? "bg-card border border-border" : "bg-muted grayscale opacity-50 border border-border"

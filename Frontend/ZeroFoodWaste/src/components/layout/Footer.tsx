@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Leaf, Heart, Github, Twitter, Linkedin } from "lucide-react";
+import { Leaf, Github, Twitter, Linkedin } from "lucide-react";
 
 export const Footer = () => {
   return (

@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -180,7 +179,7 @@ const MapPage = () => {
                 disabled={false}
               />
             </div>
-            
+
             {/* Floating Filter Nav Bar */}
             <div className="flex gap-1.5 flex-wrap bg-white/90 backdrop-blur-xl p-1.5 rounded-[1.5rem] border border-white/50 shadow-2xl shadow-slate-900/10">
               {(
@@ -204,11 +203,10 @@ const MapPage = () => {
                   key={key}
                   variant="ghost"
                   onClick={() => setFilterType(key)}
-                  className={`h-11 px-5 rounded-2xl text-sm font-bold transition-all duration-300 ${
-                    filterType === key 
-                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5" 
+                  className={`h-11 px-5 rounded-2xl text-sm font-bold transition-all duration-300 ${filterType === key
+                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5"
                       : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
-                  }`}
+                    }`}
                 >
                   {label}
                 </Button>
@@ -217,11 +215,10 @@ const MapPage = () => {
               <Button
                 variant="ghost"
                 onClick={() => setShowMatchLine((v) => !v)}
-                className={`h-11 px-4 rounded-2xl text-sm font-bold transition-all duration-300 ${
-                  showMatchLine 
-                    ? "bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm" 
+                className={`h-11 px-4 rounded-2xl text-sm font-bold transition-all duration-300 ${showMatchLine
+                    ? "bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm"
                     : "text-slate-600 hover:bg-slate-100/80"
-                }`}
+                  }`}
                 title="Toggle NGO matching line"
               >
                 <Route className="w-4 h-4 mr-2" /> Match
@@ -282,7 +279,7 @@ const MapPage = () => {
         {/* Nearest NGO match info */}
         <AnimatePresence>
           {nearestNGOLine && showMatchLine && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -352,13 +349,12 @@ const MapPage = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center text-2xl shadow-inner border border-white/50 ${
-                        selectedMarker.type === "donation"
+                      className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center text-2xl shadow-inner border border-white/50 ${selectedMarker.type === "donation"
                           ? "bg-gradient-to-br from-emerald-100 to-emerald-50"
                           : selectedMarker.type === "ngo"
                             ? "bg-gradient-to-br from-blue-100 to-blue-50"
                             : "bg-gradient-to-br from-amber-100 to-amber-50"
-                      }`}
+                        }`}
                     >
                       {selectedMarker.type === "donation" ? "🍎" : selectedMarker.type === "ngo" ? "🏢" : "🚴"}
                     </div>

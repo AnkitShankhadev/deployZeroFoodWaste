@@ -15,10 +15,6 @@ import {
 } from "@/hooks/useAchievements";
 import {
   Trophy,
-  Star,
-  Gift,
-  Building2,
-  Users,
   Loader,
   Lock,
   ChevronRight,
