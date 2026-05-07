@@ -226,7 +226,7 @@ const Donations = () => {
 
                       <div className="flex flex-wrap gap-2 text-sm font-bold opacity-90 mb-8">
                         <span className="bg-background/50 px-4 py-2 rounded-xl border border-foreground/10">
-                          {donation.quantity} {donation.quantityUnit || "units"}
+                          {donation.quantity} {donation.quantityUnit || "kg"}
                         </span>
                         <span className="bg-background/50 px-4 py-2 rounded-xl border border-foreground/10">
                           Expiry: {donation.expiryDate ? getTimeRemaining(donation.expiryDate) : "N/A"}

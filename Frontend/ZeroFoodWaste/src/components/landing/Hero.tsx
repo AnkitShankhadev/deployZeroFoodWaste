@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -32,12 +31,7 @@ export const Hero = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center lg:text-left"
-          >
+          <div className="text-center lg:text-left">
 
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight mb-6 tracking-tight">
@@ -68,39 +62,28 @@ export const Hero = () => {
                 { value: stats.totalDonors, label: "Volunteers" },
                 { value: stats.totalNGOs, label: "NGOs" },
               ].map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + i * 0.1 }}
-                  className="text-center lg:text-left"
-                >
+                <div key={stat.label} className="text-center lg:text-left">
                   <div className="text-3xl md:text-4xl font-bold tracking-tight text-primary">
                     {stat.value}
                   </div>
                   <div className="text-sm font-medium text-muted-foreground mt-1">{stat.label}</div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Hero Image/Illustration */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative hidden lg:block"
-          >
+          <div className="relative hidden lg:block">
             <div className="relative pl-8">
               <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/20 border-[8px] border-card z-10 w-full aspect-[4/3] hover-lift image-zoom-container">
                 <img
-                  src="https://images.unsplash.com/photo-1593113565214-06cba6e850bd?auto=format&fit=crop&q=80&w=1200"
+                  src="/image/food donation.avif"
                   alt="Volunteers sharing food"
                   className="w-full h-full object-cover image-zoom"
                 />
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section >

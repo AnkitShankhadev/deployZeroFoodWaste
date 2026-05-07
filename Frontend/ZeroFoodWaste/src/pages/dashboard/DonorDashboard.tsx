@@ -151,7 +151,7 @@ const DonorDashboard = () => {
               <div>
                 <p className="text-primary-foreground/80 text-sm font-semibold uppercase tracking-widest mb-1">Donor Dashboard</p>
                 <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground tracking-tight">
-                  Welcome back, {user?.name?.split(' ')[0] || "Donor"} 👋
+                  Welcome back, {user?.name?.split(' ')[0] || "Donor"}
                 </h1>
                 <p className="text-primary-foreground/60 mt-2 text-base">
                   Here's what's happening with your donations
@@ -318,7 +318,6 @@ const DonorDashboard = () => {
               <Card className="border-0 shadow-sm bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
-                    <Trophy className="w-4 h-4 text-amber-500" />
                     Your Progress
                   </CardTitle>
                 </CardHeader>
@@ -346,7 +345,6 @@ const DonorDashboard = () => {
               <Card className="border-0 shadow-sm bg-card">
                 <CardHeader className="flex flex-row items-center justify-between pb-3">
                   <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-amber-500" />
                     Achievements
                     <span className="ml-1 inline-flex items-center justify-center rounded-full bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5">
                       {achievements.filter(a => a.unlocked).length}/{achievements.length}

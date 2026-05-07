@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 
 
 const steps = [
@@ -7,7 +6,7 @@ const steps = [
     title: "List Your Food",
     description: "Snap a photo, add details about quantity and expiry. Our simple interface makes it easy to log surplus food in less than a minute. Real-time updates ensure your listing is visible instantly.",
     color: "from-primary/60 to-primary",
-    image: "https://images.unsplash.com/photo-1615897277884-a130f1d0639e?auto=format&fit=crop&q=80&w=800",
+    image: "images/landing/step1.png",
     bgAccent: "bg-primary/20",
     textColor: "text-primary",
   },
@@ -16,7 +15,7 @@ const steps = [
     title: "Get Matched",
     description: "Our intelligent geography-based system instantly finds nearby NGOs and community centers who can accept and distribute your donation quickly, minimizing transit times and maximizing freshness.",
     color: "from-secondary/60 to-secondary",
-    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=800",
+    image: "images/landing/step2.png",
     bgAccent: "bg-secondary/30",
     textColor: "text-secondary-foreground",
   },
@@ -25,7 +24,7 @@ const steps = [
     title: "Easy Pickup",
     description: "A registered volunteer picks up the food at your convenience. You can track the entire journey of your donation from your doorstep to its final destination with full transparency.",
     color: "from-accent/60 to-accent",
-    image: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&q=80&w=800",
+    image: "images/landing/step3.png",
     bgAccent: "bg-accent/20",
     textColor: "text-accent-foreground",
   },
@@ -48,12 +47,7 @@ export const HowItWorks = () => {
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary/30 rounded-full blur-3xl opacity-50" />
 
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
+        <div className="text-center mb-20">
 
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
             Donate Food in{" "}
@@ -62,7 +56,7 @@ export const HowItWorks = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             We've made it incredibly easy to share your surplus food and make a tangible difference in someone's life, all through an intuitive process.
           </p>
-        </motion.div>
+        </div>
 
         <div className="flex flex-col gap-24">
           {steps.map((step, index) => {
@@ -74,13 +68,7 @@ export const HowItWorks = () => {
                 className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-20`}
               >
                 {/* Image Section */}
-                <motion.div
-                  initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6 }}
-                  className="w-full lg:w-1/2"
-                >
+                <div className="w-full lg:w-1/2">
                   <div className="relative image-zoom-container rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border-8 border-background hover-lift">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10 pointer-events-none" />
                     <img
@@ -89,16 +77,10 @@ export const HowItWorks = () => {
                       className="w-full h-72 lg:h-80 object-cover image-zoom"
                     />
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Text Content Section */}
-                <motion.div
-                  initial={{ opacity: 0, x: isEven ? 50 : -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="w-full lg:w-1/2 flex flex-col justify-center"
-                >
+                <div className="w-full lg:w-1/2 flex flex-col justify-center">
                   <div className="flex items-center gap-4 mb-6">
                     <div className={`text-5xl font-black select-none ${step.textColor} opacity-20`}>
                       {step.number}
@@ -113,7 +95,7 @@ export const HowItWorks = () => {
                   <p className="text-lg text-muted-foreground leading-relaxed mb-8">
                     {step.description}
                   </p>
-                </motion.div>
+                </div>
               </div>
             );
           })}
