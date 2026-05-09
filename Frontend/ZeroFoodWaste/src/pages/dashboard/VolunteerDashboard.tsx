@@ -27,17 +27,6 @@ import { api } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { buildVolunteerAchievements, useAchievementNotifications } from "@/hooks/useAchievements";
 
-const foodTypeEmojis: Record<string, string> = {
-  Vegetables: "🥕",
-  Bakery: "🍞",
-  "Cooked Food": "🍱",
-  Dairy: "🥛",
-  Fruits: "🍎",
-  Packaged: "🥫",
-  Grains: "🌾",
-  Meat: "🍖",
-  Seafood: "🐟",
-};
 
 type AssignmentStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
@@ -301,7 +290,6 @@ const VolunteerDashboard = () => {
           <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-primary to-accent shadow-xl">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-luminosity"
-              style={{ backgroundImage: `url('https://images.unsplash.com/photo-1594708767771-a7502209ff51?auto=format&fit=crop&q=80&w=1600')` }}
             />
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-8 md:p-10">
               <div className="flex items-center gap-4">
@@ -523,7 +511,7 @@ const VolunteerDashboard = () => {
                       <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center text-lg">
-                            {foodTypeEmojis[task.title] || "🍽️"}
+                          
                           </div>
                           <div>
                             <p className="font-semibold text-foreground text-sm">{task.title}</p>

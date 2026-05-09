@@ -13,7 +13,6 @@ import {
   MapPin,
   Calendar,
   ChevronRight,
-  Trophy,
   Lock,
 } from "lucide-react";
 import { api } from "@/lib/api";
@@ -145,7 +144,6 @@ const DonorDashboard = () => {
           <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-primary to-accent shadow-xl">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-luminosity"
-              style={{ backgroundImage: `url('https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&q=80&w=1600')` }}
             />
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-8 md:p-10">
               <div>

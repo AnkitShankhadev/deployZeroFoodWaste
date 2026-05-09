@@ -24,19 +24,19 @@ export function Stats() {
 
   const displayStats = [
     {
-      image: "https://images.unsplash.com/photo-1593113565214-80afcb4d4d6b?auto=format&fit=crop&q=80&w=600",
+      image: "/image/listing food.jpg",
       value: stats.completedDonations > 0 ? `${(stats.completedDonations * 3).toLocaleString()}kg` : "0",
       label: "Food Saved",
       detail: "From going to waste",
     },
     {
-      image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80&w=600",
+      image: "/image/volunteer.png",
       value: stats.totalDonors > 0 ? `${stats.totalDonors.toLocaleString()}+` : "0",
       label: "Active Users",
       detail: "Donors & volunteers",
     },
     {
-      image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=600",
+      image: "/image/community that cares.jpg",
       value: stats.totalNGOs > 0 ? `${stats.totalNGOs.toLocaleString()}+` : "0",
       label: "NGO Partners",
       detail: "Local partners",

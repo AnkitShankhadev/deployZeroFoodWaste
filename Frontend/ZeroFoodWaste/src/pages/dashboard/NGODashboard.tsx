@@ -217,7 +217,6 @@ const NGODashboard = () => {
           <div className="relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r from-primary to-accent shadow-xl">
             <div
               className="absolute inset-0 bg-cover bg-center opacity-15"
-              style={{ backgroundImage: `url('https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=1600')` }}
             />
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-8 md:p-10">
               <div className="flex items-center gap-4">
