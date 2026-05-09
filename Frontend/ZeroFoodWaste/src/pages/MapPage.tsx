@@ -348,16 +348,51 @@ const MapPage = () => {
               <div className="bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-2xl shadow-slate-900/20 border border-white/50 p-6 pointer-events-auto">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    <div
-                      className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center text-2xl shadow-inner border border-white/50 ${selectedMarker.type === "donation"
-                          ? "bg-gradient-to-br from-emerald-100 to-emerald-50"
-                          : selectedMarker.type === "ngo"
-                            ? "bg-gradient-to-br from-blue-100 to-blue-50"
-                            : "bg-gradient-to-br from-amber-100 to-amber-50"
+                    {/* Profile image — always tries to show photo; falls back to initial letter */}
+                    {selectedMarker.profileImage ? (
+                      <div
+                        className={`w-14 h-14 rounded-[1.25rem] overflow-hidden flex-shrink-0 border-2 ${
+                          selectedMarker.type === "donation"
+                            ? "border-emerald-300"
+                            : selectedMarker.type === "ngo"
+                            ? "border-blue-300"
+                            : "border-amber-300"
+                        } shadow-md`}
+                      >
+                        <img
+                          src={selectedMarker.profileImage}
+                          alt={selectedMarker.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // If image fails, swap to an initial-letter div
+                            const wrapper = e.currentTarget.parentElement;
+                            if (wrapper) {
+                              const initial = selectedMarker.title.charAt(0).toUpperCase();
+                              const bg =
+                                selectedMarker.type === "donation"
+                                  ? "#10b981"
+                                  : selectedMarker.type === "ngo"
+                                  ? "#3b82f6"
+                                  : "#f59e0b";
+                              wrapper.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${bg};color:#fff;font-size:22px;font-weight:900;font-family:Arial,sans-serif;">${initial}</div>`;
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      /* No profile image: show colored initial-letter avatar */
+                      <div
+                        className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center text-2xl font-black text-white shadow-md flex-shrink-0 ${
+                          selectedMarker.type === "donation"
+                            ? "bg-emerald-500"
+                            : selectedMarker.type === "ngo"
+                            ? "bg-blue-500"
+                            : "bg-amber-500"
                         }`}
-                    >
-                      {selectedMarker.type === "donation" ? "🍎" : selectedMarker.type === "ngo" ? "🏢" : "🚴"}
-                    </div>
+                      >
+                        {selectedMarker.title.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <h3 className="text-lg font-extrabold text-slate-900 tracking-tight leading-tight mb-1">
                         {selectedMarker.title}
@@ -435,13 +470,17 @@ const MapPage = () => {
                   </div>
                 )}
 
-                <div className="flex gap-3">
+                 <div className="flex gap-3">
                   <Button
                     variant="outline"
                     className="flex-1 rounded-xl h-11 font-bold border-slate-200 text-slate-700 hover:bg-slate-50"
                     onClick={() => {
+                      const origin = userLocation
+                        ? `${userLocation.lat},${userLocation.lng}`
+                        : "";
+                      const dest = `${selectedMarker.latitude},${selectedMarker.longitude}`;
                       window.open(
-                        `https://www.openstreetmap.org/directions?from=${userLocation?.lat ?? ""},${userLocation?.lng ?? ""}&to=${selectedMarker.latitude},${selectedMarker.longitude}`,
+                        `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}`,
                         "_blank"
                       );
                     }}
@@ -449,7 +488,21 @@ const MapPage = () => {
                     <Navigation className="w-4 h-4 mr-2" />
                     Directions
                   </Button>
-                  <Button className="flex-1 rounded-xl h-11 font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 transition-transform hover:-translate-y-0.5">
+                  <Button
+                    className="flex-1 rounded-xl h-11 font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 transition-transform hover:-translate-y-0.5"
+                    onClick={() => {
+                      const phone = selectedMarker.phone;
+                      if (phone) {
+                        window.open(`tel:${phone}`, "_self");
+                      } else {
+                        toast({
+                          title: "No contact info available",
+                          description: "This partner has not provided a phone number.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
                     {selectedMarker.type === "donation" ? "Accept Request" : "Contact Partner"}
                     <ChevronRight className="w-4 h-4 ml-1.5" />
                   </Button>

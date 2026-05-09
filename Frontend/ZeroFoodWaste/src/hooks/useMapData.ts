@@ -16,7 +16,9 @@ export interface MapMarker {
   foodType?: string;
   organizationName?: string;
   description?: string;
-  donor?: { name: string };
+  phone?: string;
+  profileImage?: string;
+  donor?: { name: string; phone?: string; profileImage?: string };
 }
 
 async function fetchPublic<T>(endpoint: string): Promise<T> {
@@ -60,6 +62,8 @@ export function useMapData() {
               foodType: d.foodType,
               description: d.description,
               donor: d.donor,
+              phone: d.donor?.phone,
+              profileImage: d.donor?.profileImage,
             });
           }
         }
@@ -91,6 +95,8 @@ export function useMapData() {
               longitude: lng,
               organizationName: u.title,
               description: u.description,
+              phone: u.phone,
+              profileImage: u.profileImage,
             });
           }
         }

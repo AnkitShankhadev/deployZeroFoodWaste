@@ -170,7 +170,7 @@ exports.getMapPins = async (req, res, next) => {
       'location.lat': { $exists: true },
       'location.lng': { $exists: true },
     })
-      .select('name role location description')
+      .select('name role location description phone profileImage')
       .lean();
 
     const pins = users.map((u) => ({
@@ -181,6 +181,8 @@ exports.getMapPins = async (req, res, next) => {
       longitude: u.location.lng,
       address: u.location.address || null,
       description: u.description || null,
+      phone: u.phone || null,
+      profileImage: u.profileImage || null,
     }));
 
     res.status(200).json({

@@ -425,7 +425,7 @@ exports.getDonationLocations = async (req, res, next) => {
       "location.lng": { $exists: true },
     })
       .select("foodType quantity quantityUnit expiryDate description status location donorId")
-      .populate("donorId", "name profileImage")
+      .populate("donorId", "name profileImage phone")
       .lean();
 
     const locations = donations.map((d) => ({
@@ -439,7 +439,7 @@ exports.getDonationLocations = async (req, res, next) => {
       latitude: d.location.lat,
       longitude: d.location.lng,
       address: d.location.address,
-      donor: d.donorId ? { name: d.donorId.name } : null,
+      donor: d.donorId ? { name: d.donorId.name, phone: d.donorId.phone, profileImage: d.donorId.profileImage } : null,
     }));
 
     res.status(200).json({

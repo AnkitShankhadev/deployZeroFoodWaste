@@ -455,8 +455,10 @@ const VolunteerDashboard = () => {
                       </div>
 
                       <div className="flex gap-3 pt-1">
-                        <Button variant="outline" className="flex-1 gap-2 rounded-xl h-11 border-border hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all">
-                          <Navigation className="w-4 h-4" />Navigate
+                        <Button asChild variant="outline" className="flex-1 gap-2 rounded-xl h-11 border-border hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all">
+                          <Link to="/map">
+                            <Navigation className="w-4 h-4" />Navigate
+                          </Link>
                         </Button>
                         {currentTask.status === "PENDING" ? (
                           <Button className="flex-1 gap-2 rounded-xl h-11 bg-amber-500 hover:bg-amber-600 text-white font-bold" onClick={handleMarkPickedUp} disabled={isMarkingPickedUp}>

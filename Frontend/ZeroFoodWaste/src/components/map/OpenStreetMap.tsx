@@ -20,7 +20,7 @@ const MARKER_CONFIG: Record<
   volunteer: { color: "#f59e0b", label: "V" },
 };
 
-/** Build a safe SVG data-URL — only ASCII, no emoji, avoids btoa() */
+/** Build an SVG data-URL showing a letter label (fallback) */
 function svgDataUrl(color: string, label: string, selected: boolean): string {
   const ring = selected
     ? `<circle cx="22" cy="22" r="22" fill="${color}" opacity="0.3"/>`
@@ -36,13 +36,42 @@ function svgDataUrl(color: string, label: string, selected: boolean): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-function makeIcon(color: string, label: string, selected: boolean): L.DivIcon {
+/** Build a Leaflet DivIcon — uses profile image if provided, otherwise letter fallback */
+function makeIcon(
+  color: string,
+  label: string,
+  selected: boolean,
+  profileImage?: string
+): L.DivIcon {
+  const size = 48;
+  const half = size / 2;
+  const ring = selected
+    ? `box-shadow:0 0 0 4px ${color}55, 0 2px 12px rgba(0,0,0,0.25);`
+    : `box-shadow:0 2px 8px rgba(0,0,0,0.22);`;
+
+  let inner: string;
+  if (profileImage) {
+    inner =
+      `<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;` +
+      `border:3px solid ${color};${ring}background:#fff;">` +
+      `<img src="${profileImage}" width="${size}" height="${size}" ` +
+      `style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" ` +
+      `onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:${color};color:#fff;font-weight:bold;font-size:18px;font-family:Arial,sans-serif;\'>${label}</div>'"/>`+
+      `</div>`;
+  } else {
+    inner =
+      `<div style="width:${size}px;height:${size}px;border-radius:50%;display:flex;` +
+      `align-items:center;justify-content:center;background:${color};` +
+      `border:3px solid white;${ring}color:#fff;font-weight:bold;font-size:20px;` +
+      `font-family:Arial,sans-serif;">${label}</div>`;
+  }
+
   return new L.DivIcon({
-    html: `<img src="${svgDataUrl(color, label, selected)}" width="44" height="44" alt="${label}"/>`,
+    html: inner,
     className: "",
-    iconSize: [44, 44],
-    iconAnchor: [22, 22],
-    popupAnchor: [0, -26],
+    iconSize: [size, size],
+    iconAnchor: [half, half],
+    popupAnchor: [0, -half - 4],
   });
 }
 
@@ -158,7 +187,7 @@ export function OpenStreetMapComponent({
     markers.forEach((md) => {
       const cfg = MARKER_CONFIG[md.type] ?? MARKER_CONFIG.donation;
       const isSelected = md.id === selectedMarkerId;
-      const icon = makeIcon(cfg.color, cfg.label, isSelected);
+      const icon = makeIcon(cfg.color, cfg.label, isSelected, md.profileImage);
 
       const typeLabel =
         md.type === "donation" ? "Donation" : md.type === "ngo" ? "NGO" : "Volunteer";
