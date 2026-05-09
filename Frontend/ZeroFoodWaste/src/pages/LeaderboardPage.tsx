@@ -176,9 +176,6 @@ const LeaderboardPage = () => {
           <div className={`relative rounded-3xl overflow-hidden mb-8 bg-gradient-to-r ${colors.bg} shadow-xl`}>
             <div
               className="absolute inset-0 bg-cover bg-center opacity-10"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80&w=1600')`,
-              }}
             />
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 p-8 md:p-10">
               <div className="flex items-center gap-4">
