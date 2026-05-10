@@ -35,7 +35,7 @@ export const Features = () => {
             A comprehensive platform designed to make food donation simple,
             rewarding, and impactful for everyone involved in the community.
           </p>
-          </div>
+        </div>
 
         <div className="space-y-24">
           {features.map((feature, index) => (
