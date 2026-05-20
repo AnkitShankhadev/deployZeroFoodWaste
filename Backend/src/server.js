@@ -16,6 +16,10 @@ const server = app.listen(PORT, () => {
   );
 });
 
+// Initialize socket.io
+const socket = require('./socket');
+socket.init(server);
+
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (err) => {
   console.log(`Error: ${err.message}`);

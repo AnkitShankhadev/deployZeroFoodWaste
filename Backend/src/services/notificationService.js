@@ -44,6 +44,14 @@ const createNotification = async (userId, message, type, relatedId = null, metad
       });
     }
 
+    // Emit real-time notification via socket.io
+    try {
+      const socket = require('../socket');
+      socket.getIO().to(userId.toString()).emit('notification', notification);
+    } catch (err) {
+      console.error('Socket notification failed:', err.message);
+    }
+
     return notification;
   } catch (error) {
     throw new Error(`Error creating notification: ${error.message}`);

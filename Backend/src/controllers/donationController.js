@@ -134,7 +134,7 @@ exports.updateDonation = async (req, res, next) => {
     }
 
     // Can't update if already accepted or completed
-    if (["ACCEPTED", "ASSIGNED", "COMPLETED"].includes(donation.status)) {
+    if (["ACCEPTED", "ASSIGNED", "DELIVERED"].includes(donation.status)) {
       return next(
         new AppError("Cannot update donation in current status", 400),
       );
@@ -253,11 +253,11 @@ exports.completeDonation = async (req, res, next) => {
       );
     }
 
-    if (donation.status === "COMPLETED") {
+    if (donation.status === "DELIVERED") {
       return next(new AppError("Donation already completed", 400));
     }
 
-    donation.status = "COMPLETED";
+    donation.status = "DELIVERED";
     donation.completedAt = new Date();
     await donation.save();
 
@@ -341,7 +341,7 @@ exports.cancelDonation = async (req, res, next) => {
       return next(new AppError("Not authorized to cancel this donation", 403));
     }
 
-    if (["COMPLETED", "CANCELLED"].includes(donation.status)) {
+    if (["DELIVERED", "CANCELLED"].includes(donation.status)) {
       return next(
         new AppError("Cannot cancel donation in current status", 400),
       );
@@ -396,7 +396,7 @@ exports.deleteDonation = async (req, res, next) => {
     }
 
     // Can only delete if not accepted or completed
-    if (["ACCEPTED", "ASSIGNED", "COMPLETED"].includes(donation.status)) {
+    if (["ACCEPTED", "ASSIGNED", "DELIVERED"].includes(donation.status)) {
       return next(
         new AppError("Cannot delete donation in current status", 400),
       );

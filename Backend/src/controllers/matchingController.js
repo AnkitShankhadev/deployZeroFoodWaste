@@ -301,13 +301,16 @@ exports.updateAssignmentStatus = async (req, res, next) => {
         );
       }
 
-      // Award points to volunteer
+      // Award points to volunteer using pointsService
       const pointsEarned = 50;
-      const volunteer = await User.findById(req.user.id);
-      if (volunteer) {
-        volunteer.totalPoints = (volunteer.totalPoints || 0) + pointsEarned;
-        await volunteer.save();
-      }
+      await pointsService.awardPoints(
+        req.user.id,
+        pointsEarned,
+        "PICKUP",
+        "VOLUNTEER",
+        assignment._id,
+        "Delivery completed"
+      );
 
       // Send notification to volunteer
       await notificationService.createNotification(

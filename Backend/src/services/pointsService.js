@@ -4,6 +4,9 @@ const Leaderboard = require("../models/Leaderboard");
 const Achievement = require("../models/Achievement");
 const Badge = require("../models/Badge");
 const notificationService = require("./notificationService");
+const { DONOR_ACHIEVEMENTS, NGO_ACHIEVEMENTS, VOLUNTEER_ACHIEVEMENTS } = require("../config/achievements");
+const FoodDonation = require("../models/FoodDonation");
+const PickupAssignment = require("../models/PickupAssignment");
 
 /**
  * Award points to a user
@@ -199,69 +202,139 @@ const recalculateRanks = async (role) => {
 const checkAchievements = async (userId, role) => {
   try {
     const user = await User.findById(userId);
-    const donationsCount = await Points.countDocuments({
-      userId,
-      source: "DONATION",
-    });
-    const pickupsCount = await Points.countDocuments({
-      userId,
-      source: "PICKUP",
-    });
+    if (!user) return;
+    
+    let potentialAchievements = [];
+    
+    if (role === 'DONOR') {
+      potentialAchievements = DONOR_ACHIEVEMENTS;
+    } else if (role === 'NGO') {
+      potentialAchievements = NGO_ACHIEVEMENTS;
+    } else if (role === 'VOLUNTEER') {
+      potentialAchievements = VOLUNTEER_ACHIEVEMENTS;
+    }
 
-    // Check for milestone achievements
-    const milestones = [
-      { count: 5, title: "First Steps", points: 25 },
-      { count: 10, title: "Getting Started", points: 50 },
-      { count: 25, title: "Making a Difference", points: 100 },
-      { count: 50, title: "Community Hero", points: 200 },
-      { count: 100, title: "Food Waste Warrior", points: 500 },
-    ];
+    // Pre-calculate some common stats to save DB calls
+    const donationsCount = await Points.countDocuments({ userId, source: "DONATION" });
+    const pickupsCount = await Points.countDocuments({ userId, source: "PICKUP" });
+    const collectionsCount = await Points.countDocuments({ userId, source: "DONATION", role: "NGO" });
 
-    const totalActions = role === "DONOR" ? donationsCount : pickupsCount;
+    for (const achievementDef of potentialAchievements) {
+      // Check if user already has this achievement
+      const existingAchievement = await Achievement.findOne({
+        userId,
+        "metadata.achievementId": achievementDef.id
+      });
 
-    for (const milestone of milestones) {
-      if (totalActions >= milestone.count) {
-        // Check if achievement already exists
-        const existingAchievement = await Achievement.findOne({
+      if (existingAchievement) continue;
+
+      let achieved = false;
+
+      // Check trigger conditions
+      switch (achievementDef.trigger) {
+        case "DONATION_COUNT":
+          achieved = donationsCount >= achievementDef.targetValue;
+          break;
+        case "PICKUP_COUNT":
+          achieved = pickupsCount >= achievementDef.targetValue;
+          break;
+        case "COLLECTION_COUNT":
+          achieved = collectionsCount >= achievementDef.targetValue;
+          break;
+        case "TOTAL_QUANTITY":
+          if (role === 'DONOR') {
+            const donations = await FoodDonation.find({ donorId: userId, status: { $in: ["DELIVERED", "COMPLETED", "ACCEPTED", "ASSIGNED"] } });
+            let total = 0;
+            donations.forEach(d => { total += (parseFloat(d.quantity) || 0); });
+            achieved = total >= achievementDef.targetValue;
+          } else if (role === 'VOLUNTEER') {
+             const assignments = await PickupAssignment.find({ volunteerId: userId, status: "COMPLETED" }).populate('donationId');
+             let total = 0;
+             assignments.forEach(a => {
+                if (a.donationId && a.donationId.quantity) {
+                   total += (parseFloat(a.donationId.quantity) || 0);
+                }
+             });
+             achieved = total >= achievementDef.targetValue;
+          } else if (role === 'NGO') {
+             const donations = await FoodDonation.find({ acceptedBy: userId, status: { $in: ["DELIVERED", "COMPLETED"] } });
+             let total = 0;
+             donations.forEach(d => { total += (parseFloat(d.quantity) || 0); });
+             achieved = total >= achievementDef.targetValue;
+          }
+          break;
+        case "FOOD_TYPE_VARIETY":
+          if (role === 'DONOR') {
+            const distinctTypes = await FoodDonation.distinct("foodType", { donorId: userId });
+            achieved = distinctTypes.length >= achievementDef.targetValue;
+          }
+          break;
+        case "CONSECUTIVE_DAYS":
+          const points = await Points.find({ userId }).sort({ earnedAt: 1 }).select('earnedAt');
+          if (points.length > 0) {
+            let maxStreak = 1;
+            let currentStreak = 1;
+            let lastDate = new Date(points[0].earnedAt).setHours(0,0,0,0);
+            for (let i = 1; i < points.length; i++) {
+               const currentDate = new Date(points[i].earnedAt).setHours(0,0,0,0);
+               const diffTime = Math.abs(currentDate - lastDate);
+               const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+               if (diffDays === 1) {
+                  currentStreak++;
+                  maxStreak = Math.max(maxStreak, currentStreak);
+               } else if (diffDays > 1) {
+                  currentStreak = 1;
+               }
+               lastDate = currentDate;
+            }
+            achieved = maxStreak >= achievementDef.targetValue;
+          }
+          break;
+        case "RESPONSE_TIME":
+          achieved = collectionsCount >= 10;
+          break;
+        case "DELIVERY_TIME":
+        case "ON_TIME_DELIVERIES":
+           achieved = pickupsCount >= achievementDef.targetValue;
+           break;
+        default:
+          break;
+      }
+
+      if (achieved) {
+        // Award achievement
+        const newAchievement = await Achievement.create({
           userId,
-          type: "MILESTONE",
-          "metadata.milestoneValue": milestone.count,
+          type: achievementDef.type,
+          title: achievementDef.title,
+          description: achievementDef.description,
+          pointsAwarded: achievementDef.pointsAwarded,
+          metadata: {
+            achievementId: achievementDef.id,
+            targetValue: achievementDef.targetValue,
+          },
         });
 
-        if (!existingAchievement) {
-          // Award achievement
-          await Achievement.create({
-            userId,
-            type: "MILESTONE",
-            title: milestone.title,
-            description: `Completed ${milestone.count} ${role === "DONOR" ? "donations" : "pickups"}`,
-            pointsAwarded: milestone.points,
-            metadata: {
-              milestoneValue: milestone.count,
-            },
-          });
+        // Award points for achievement
+        await module.exports.awardPoints(
+          userId,
+          achievementDef.pointsAwarded,
+          "ACHIEVEMENT",
+          role,
+          newAchievement._id,
+          `Achievement unlocked: ${achievementDef.title}`
+        );
 
-          // Award points for achievement
-          await awardPoints(
-            userId,
-            milestone.points,
-            "ACHIEVEMENT",
-            role,
-            null,
-            `Achievement unlocked: ${milestone.title}`,
-          );
-
-          // Send notification
-          await notificationService.createNotification(
-            userId,
-            `Achievement unlocked: ${milestone.title}!`,
-            "BADGE_EARNED",
-          );
-        }
+        // Send notification
+        await notificationService.createNotification(
+          userId,
+          `Achievement unlocked: ${achievementDef.title}!`,
+          "BADGE_EARNED"
+        );
       }
     }
   } catch (error) {
-    throw new Error(`Error checking achievements: ${error.message}`);
+    console.error("Error checking achievements:", error.message);
   }
 };
 

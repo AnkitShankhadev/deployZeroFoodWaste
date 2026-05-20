@@ -13,6 +13,9 @@ const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 
+const xss = require('xss-clean');
+const mongoSanitize = require('express-mongo-sanitize');
+
 const app = express();
 
 // ✅ FIX: Proper CORS configuration
@@ -42,6 +45,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
 
 // Request logging middleware (for debugging)
 app.use((req, res, next) => {

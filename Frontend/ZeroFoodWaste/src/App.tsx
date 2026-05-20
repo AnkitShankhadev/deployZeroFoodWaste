@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
+import { SocketProvider } from "./hooks/useSocket";
 import { LandingPage } from "./pages/LandingPage";
 import Auth from "./pages/Auth";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -13,7 +14,7 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import DonorDashboard from "./pages/dashboard/DonorDashboard";
 import NGODashboard from "./pages/dashboard/NGODashboard";
 import VolunteerDashboard from "./pages/dashboard/VolunteerDashboard";
-import { AdminDashboard } from "./pages/dashboard/AdminDashboard";
+
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 
@@ -21,8 +22,9 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+      <SocketProvider>
+        <BrowserRouter>
+          <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -70,17 +72,10 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/dashboard/admin"
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </SocketProvider>
     </AuthProvider>
   );
 }
