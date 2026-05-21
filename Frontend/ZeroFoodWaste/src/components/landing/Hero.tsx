@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin, Leaf, Users, Package } from "lucide-react";
+import { ArrowRight, Leaf, } from "lucide-react";
 import { api } from "@/lib/api";
 
+const HERO_IMAGES = [
+  "/image/food donation.avif",
+  "/image/hero_food_donation.png",
+  "/image/listing food.jpg",
+  "images/landing/step3.png",
+];
+
 export const Hero = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [stats, setStats] = useState({
     completedDonations: 0,
     totalDonors: 0,
@@ -25,6 +33,13 @@ export const Hero = () => {
     fetchStats();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="font-sans">
       {/* Announcement Bar */}
@@ -40,14 +55,19 @@ export const Hero = () => {
       {/* Hero Section */}
       <section className="relative min-h-[92vh] flex items-center overflow-hidden pt-16">
         {/* Background Image with overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/image/food donation.avif"
-            alt="Food sharing community"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <div className="absolute inset-0 z-0 bg-black">
+          {HERO_IMAGES.map((src, index) => (
+            <img
+              key={src}
+              src={src}
+              alt={`Food sharing community ${index + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                index === currentImageIndex ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
         </div>
 
         {/* Wavy bottom divider */}
@@ -57,24 +77,16 @@ export const Hero = () => {
           </svg>
         </div>
 
-        <div className="container mx-auto px-4 relative z-10 py-20">
-          <div className="max-w-2xl">
-
-
-
+        <div className="container mx-auto px-4 relative z-10 py-20 flex flex-col items-center text-center">
+          <div className="max-w-3xl flex flex-col items-center">
             {/* Main Headline */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-6 tracking-tight">
               Don't Waste It.{" "}
               <span className="text-emerald-400">Share It.</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg leading-relaxed font-medium">
-              Connect surplus food with people who need it. Simple, fast, and
-              free for donors, volunteers, and NGOs working together.
-            </p>
-
             {/* Dual CTA */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 mb-16 justify-center">
               <Link to="/auth">
                 <Button
                   size="lg"
@@ -87,7 +99,7 @@ export const Hero = () => {
             </div>
 
             {/* Floating stat bubbles */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
               <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-3">
                 <div>
                   <div className="text-xl font-black text-white leading-none">

@@ -41,7 +41,10 @@ export const Navbar = () => {
   };
 
   // Base navigation links
-  const baseNavLinks = [
+
+
+  // Protected navigation links (only show when authenticated)
+  const protectedNavLinks = [
     {
       href:
         user?.role === "DONOR"
@@ -53,14 +56,10 @@ export const Navbar = () => {
               : user?.role === "ADMIN"
                 ? "/dashboard/admin"
                 : "/",
-      label: "Home",
+      label: "Dashboard",
       icon: Home,
       requiresAuth: false,
     },
-  ];
-
-  // Protected navigation links (only show when authenticated)
-  const protectedNavLinks = [
     { href: "/donations", label: "Donations", icon: Gift, requiresAuth: true },
     { href: "/map", label: "Map", icon: Map, requiresAuth: true },
     {
@@ -73,7 +72,6 @@ export const Navbar = () => {
 
   // Filter navLinks based on authentication status
   const navLinks = [
-    ...baseNavLinks,
     ...(isAuthenticated ? protectedNavLinks : []),
   ];
 

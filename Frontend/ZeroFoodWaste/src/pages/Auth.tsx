@@ -15,7 +15,7 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
-  MapPin
+  MapPin,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,17 +25,36 @@ type AuthMode = "login" | "register";
 type UserRole = "donor" | "ngo" | "volunteer";
 
 const roles = [
-  { id: "donor" as UserRole, label: "Donor", icon: HandHeart, description: "Donate surplus food" },
-  { id: "ngo" as UserRole, label: "NGO", icon: Building2, description: "Collect and distribute" },
-  { id: "volunteer" as UserRole, label: "Volunteer", icon: Users, description: "Help with delivery" },
+  {
+    id: "donor" as UserRole,
+    label: "Donor",
+    icon: HandHeart,
+    description: "Donate surplus food",
+  },
+  {
+    id: "ngo" as UserRole,
+    label: "NGO",
+    icon: Building2,
+    description: "Collect and distribute",
+  },
+  {
+    id: "volunteer" as UserRole,
+    label: "Volunteer",
+    icon: Users,
+    description: "Help with delivery",
+  },
 ];
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { signIn, signUp, isAuthenticated } = useAuth();
-  const [mode, setMode] = useState<AuthMode>((searchParams.get("mode") as AuthMode) || "login");
-  const [selectedRole, setSelectedRole] = useState<UserRole>((searchParams.get("role") as UserRole) || "donor");
+  const [mode, setMode] = useState<AuthMode>(
+    (searchParams.get("mode") as AuthMode) || "login",
+  );
+  const [selectedRole, setSelectedRole] = useState<UserRole>(
+    (searchParams.get("role") as UserRole) || "donor",
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
@@ -48,8 +67,8 @@ const Auth = () => {
     location: {
       lat: 0,
       lng: 0,
-      address: ""
-    }
+      address: "",
+    },
   });
 
   // Redirect if already authenticated
@@ -96,10 +115,12 @@ const Auth = () => {
         // Reverse-geocode with Nominatim to fill in a readable address
         try {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
           );
           const data = await res.json();
-          const readableAddress = data.display_name ?? `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          const readableAddress =
+            data.display_name ??
+            `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
           setFormData((prev) => ({
             ...prev,
@@ -126,7 +147,8 @@ const Auth = () => {
       },
       (error) => {
         let errorTitle = "Location error";
-        let errorMessage = "Could not get your location. Please enter your address manually.";
+        let errorMessage =
+          "Could not get your location. Please enter your address manually.";
 
         if (error.code === error.PERMISSION_DENIED) {
           errorTitle = "Permission Denied";
@@ -134,23 +156,28 @@ const Auth = () => {
             "Location access was denied. Enable it in your browser's site settings, or type your address below.";
         } else if (error.code === error.POSITION_UNAVAILABLE) {
           errorTitle = "Position Unavailable";
-          errorMessage = "Your device could not determine your location. Please enter it manually.";
+          errorMessage =
+            "Your device could not determine your location. Please enter it manually.";
         } else if (error.code === error.TIMEOUT) {
           errorTitle = "Timed Out";
-          errorMessage = "The location request timed out. Check your GPS/network and try again.";
+          errorMessage =
+            "The location request timed out. Check your GPS/network and try again.";
         }
 
-        toast({ title: errorTitle, description: errorMessage, variant: "destructive" });
+        toast({
+          title: errorTitle,
+          description: errorMessage,
+          variant: "destructive",
+        });
         setIsGettingLocation(false);
       },
       {
         enableHighAccuracy: false, // faster, uses network/WiFi
-        timeout: 10000,            // 10 s — don't make the user wait 30 s
-        maximumAge: 60000,         // accept cached position up to 1 min old
-      }
+        timeout: 10000, // 10 s — don't make the user wait 30 s
+        maximumAge: 60000, // accept cached position up to 1 min old
+      },
     );
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +185,7 @@ const Auth = () => {
 
     try {
       if (mode === "login") {
-        const { error, user } = await signIn(formData.email, formData.password);  // ✅ Destructure user
+        const { error, user } = await signIn(formData.email, formData.password); // ✅ Destructure user
 
         if (error) {
           toast({
@@ -195,10 +222,14 @@ const Auth = () => {
         }
 
         // Validate location - either GPS coordinates OR manual address is required
-        if ((!formData.location.lat || !formData.location.lng) && !formData.location.address.trim()) {
+        if (
+          (!formData.location.lat || !formData.location.lng) &&
+          !formData.location.address.trim()
+        ) {
           toast({
             title: "Location required",
-            description: "Please either use 'Get My Location' or enter your address manually",
+            description:
+              "Please either use 'Get My Location' or enter your address manually",
             variant: "destructive",
           });
           setIsLoading(false);
@@ -218,7 +249,7 @@ const Auth = () => {
           formData.password,
           roleMap[selectedRole],
           formData.location,
-          formData.phone
+          formData.phone,
         );
 
         if (error) {
@@ -258,13 +289,18 @@ const Auth = () => {
         {/* Photographic Background */}
         <div
           className="absolute inset-0 bg-cover bg-center z-0 mix-blend-overlay opacity-60"
-          style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200')` }}
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200')`,
+          }}
         />
         {/* Gradient Overlay for Text Legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-green-950 via-green-900/80 to-green-800/40 z-0" />
 
         <div className="relative z-10 flex flex-col justify-center p-12 text-white w-full">
-          <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-white/80 hover:text-white transition-colors">
+          <Link
+            to="/"
+            className="absolute top-8 left-8 flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+          >
             <ArrowLeft className="w-5 h-5" />
             Back to home
           </Link>
@@ -279,14 +315,7 @@ const Auth = () => {
             <h1 className="text-4xl font-bold mb-4">
               {mode === "login" ? "Welcome Back!" : "Join Our Mission"}
             </h1>
-            <p className="text-xl text-green-100">
-              {mode === "login"
-                ? "Sign in to continue making a difference in your community."
-                : "Create an account and start saving food today."}
-            </p>
           </div>
-
-
         </div>
 
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-tl-full" />
@@ -355,12 +384,12 @@ const Auth = () => {
                         key={role.id}
                         type="button"
                         onClick={() => setSelectedRole(role.id)}
-                        className={`p-4 rounded-xl border-2 transition-all text-center ${selectedRole === role.id
-                          ? "border-primary bg-green-50 text-primary"
-                          : "border-border hover:border-primary/50"
-                          }`}
+                        className={`p-4 rounded-xl border-2 transition-all text-center ${
+                          selectedRole === role.id
+                            ? "border-primary bg-green-50 text-primary"
+                            : "border-border hover:border-primary/50"
+                        }`}
                       >
-
                         <div className="font-medium text-sm">{role.label}</div>
                       </button>
                     ))}
@@ -385,7 +414,9 @@ const Auth = () => {
                       type="text"
                       placeholder="Your name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       className="pl-10 h-12"
                       required={mode === "register"}
                     />
@@ -403,7 +434,9 @@ const Auth = () => {
                   type="email"
                   placeholder="yourgmail@example.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   className="pl-10 h-12"
                   required
                 />
@@ -419,7 +452,9 @@ const Auth = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   className="pl-10 pr-10 h-12"
                   required
                 />
@@ -428,7 +463,11 @@ const Auth = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -449,7 +488,9 @@ const Auth = () => {
                         type="tel"
                         placeholder="+977"
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, phone: e.target.value })
+                        }
                         className="h-12"
                       />
                     </div>
@@ -484,25 +525,31 @@ const Auth = () => {
                       )}
                     </Button>
 
-                    {formData.location.lat !== 0 && formData.location.lng !== 0 && (
-                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm text-green-700 flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          GPS Location: {formData.location.lat.toFixed(4)}, {formData.location.lng.toFixed(4)}
-                        </p>
-                      </div>
-                    )}
-
-
+                    {formData.location.lat !== 0 &&
+                      formData.location.lng !== 0 && (
+                        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <p className="text-sm text-green-700 flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            GPS Location: {formData.location.lat.toFixed(
+                              4,
+                            )}, {formData.location.lng.toFixed(4)}
+                          </p>
+                        </div>
+                      )}
 
                     <div>
                       <Input
                         placeholder="Enter your address (e.g., Kathmandu, Nepal)"
                         value={formData.location.address}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          location: { ...formData.location, address: e.target.value }
-                        })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            location: {
+                              ...formData.location,
+                              address: e.target.value,
+                            },
+                          })
+                        }
                         className="h-12"
                       />
                       {formData.location.address && (
@@ -518,7 +565,10 @@ const Auth = () => {
 
             {mode === "login" && (
               <div className="flex items-center justify-end">
-                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -536,21 +586,23 @@ const Auth = () => {
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   {mode === "login" ? "Signing in..." : "Creating account..."}
                 </span>
+              ) : mode === "login" ? (
+                "Sign In"
               ) : (
-                mode === "login" ? "Sign In" : "Create Account"
+                "Create Account"
               )}
             </Button>
-
-
-
-
           </form>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             By continuing, you agree to our{" "}
-            <a href="#" className="text-primary hover:underline">Terms of Service</a>
-            {" "}and{" "}
-            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            <a href="#" className="text-primary hover:underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-primary hover:underline">
+              Privacy Policy
+            </a>
           </p>
         </motion.div>
       </div>

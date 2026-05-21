@@ -11,13 +11,13 @@ const features = [
     title: "Smart Local Matching",
     description: "Our platform instantly alerts nearby NGOs and registered volunteers the moment food is available, ensuring it's rescued while it's still fresh and delicious.",
     image: "image/fast matching.avif",
-    benefits: ["Radius-based alerts", "Optimized routing", "Real-time communication"]
+    benefits: ["Radius-based alerts", "Optimized routing"]
   },
   {
     title: "A Community That Cares",
     description: "Join thousands of donors, businesses, and volunteers all working together. Earn badges, track your environmental impact, and see exactly how many meals you've saved.",
     image: "image/community that cares.jpg",
-    benefits: ["Earn rewards & points", "Track CO2 reduction", "Public leaderboards"]
+    benefits: ["Earn rewards & points", "Public leaderboards"]
   }
 ];
 
@@ -41,7 +41,7 @@ export const Features = () => {
           {features.map((feature, index) => (
             <div key={feature.title} className={`flex flex-col md:flex-row gap-12 lg:gap-16 items-center ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
               <div className="w-full md:w-1/2">
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 border-8 border-card hover-lift image-zoom-container group">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 hover-lift image-zoom-container group">
                   <img src={feature.image} alt={feature.title} className="w-full h-80 object-cover image-zoom" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                 </div>
