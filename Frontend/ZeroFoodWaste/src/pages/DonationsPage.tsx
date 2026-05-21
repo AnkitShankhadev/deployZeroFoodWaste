@@ -199,6 +199,17 @@ const Donations = () => {
                     transition={{ delay: index * 0.05 }}
                     className={`p-6 sm:p-8 rounded-[2rem] border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${cardStyle} flex flex-col h-full`}
                   >
+                    {/* Card Image */}
+                    {donation.images && donation.images.length > 0 && (
+                      <div className="w-full h-48 mb-6 rounded-2xl overflow-hidden shadow-sm border border-foreground/10 flex-shrink-0">
+                        <img 
+                          src={donation.images[0]} 
+                          alt={donation.title || donation.foodType} 
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
+
                     {/* Card Header */}
                     <div className="flex items-start justify-between mb-6">
                       <div className="w-16 h-16 bg-background/60 rounded-[1.25rem] flex items-center justify-center shadow-sm border border-foreground/10 overflow-hidden">
