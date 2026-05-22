@@ -2,10 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +16,7 @@ import {
   Check,
   AlertCircle,
   Calendar,
-  Edit3
+  Edit3,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/lib/api";
@@ -159,8 +156,8 @@ export function ProfilePage() {
         },
         ...(profilePreview &&
           profilePreview !== profile?.profileImage && {
-          profileImage: profilePreview,
-        }),
+            profileImage: profilePreview,
+          }),
       };
 
       const response = (await api.put(`/users/${user.id}`, updateData)) as any;
@@ -215,7 +212,10 @@ export function ProfilePage() {
                 <p className="text-muted-foreground mb-6">
                   Unable to load your profile. Please try again later.
                 </p>
-                <Button onClick={() => navigate("/")} className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl">
+                <Button
+                  onClick={() => navigate("/")}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
+                >
                   Go Home
                 </Button>
               </div>
@@ -235,7 +235,7 @@ export function ProfilePage() {
         {/* Header / Cover Banner */}
         <div className="relative h-[280px] md:h-[340px] w-full bg-primary overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=2000"
+            src="image/vegiees.avif"
             alt="Cover"
             className="w-full h-full object-cover opacity-30"
           />
@@ -274,7 +274,10 @@ export function ProfilePage() {
                       )}
                       {/* Hover Overlay for Edit */}
                       {isEditing && (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={handleProfileImageClick}>
+                        <div
+                          className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                          onClick={handleProfileImageClick}
+                        >
                           <Camera className="w-8 h-8 text-white" />
                         </div>
                       )}
@@ -303,11 +306,12 @@ export function ProfilePage() {
                     <h1 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight">
                       {profile.name}
                     </h1>
-
                   </div>
                   <div className="flex flex-wrap items-center gap-4 text-muted-foreground font-semibold text-sm md:text-base">
                     <span className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-xl border border-border">
-                      <div className={`w-2.5 h-2.5 rounded-full ${roleColors[profile.role]?.bg.replace('bg-', 'bg-').replace('50', '500') || 'bg-slate-500'}`}></div>
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full ${roleColors[profile.role]?.bg.replace("bg-", "bg-").replace("50", "500") || "bg-slate-500"}`}
+                      ></div>
                       {roleLabels[profile.role] || profile.role}
                     </span>
                     <span className="flex items-center gap-1.5 px-3 py-1.5">
@@ -345,7 +349,9 @@ export function ProfilePage() {
                       {isSaving ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        <><Check className="w-4 h-4 mr-2" /> Save</>
+                        <>
+                          <Check className="w-4 h-4 mr-2" /> Save
+                        </>
                       )}
                     </Button>
                   </div>
@@ -356,11 +362,14 @@ export function ProfilePage() {
             {/* Quick Stats Banner inside card */}
             <div className="bg-muted/50 flex grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border flex-col md:flex-row">
               <div className="p-6 md:p-8 flex-1 flex items-center gap-5 hover:bg-muted transition-colors">
-                <div className="w-14 h-14 rounded-2xl bg-secondary/30 text-secondary-foreground flex items-center justify-center flex-shrink-0 shadow-inner">
-                </div>
+                <div className="w-14 h-14 rounded-2xl bg-secondary/30 text-secondary-foreground flex items-center justify-center flex-shrink-0 shadow-inner"></div>
                 <div>
-                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Impact Points</p>
-                  <p className="text-3xl font-black text-foreground tracking-tight">{profile.totalPoints || 0}</p>
+                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                    Impact Points
+                  </p>
+                  <p className="text-3xl font-black text-foreground tracking-tight">
+                    {profile.totalPoints || 0}
+                  </p>
                 </div>
               </div>
               <div className="p-6 md:p-8 flex-1 flex items-center gap-5 hover:bg-muted transition-colors">
@@ -368,8 +377,15 @@ export function ProfilePage() {
                   <Calendar className="w-7 h-7" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Joined</p>
-                  <p className="text-2xl font-black text-foreground tracking-tight">{new Date(profile.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</p>
+                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                    Joined
+                  </p>
+                  <p className="text-2xl font-black text-foreground tracking-tight">
+                    {new Date(profile.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
                 </div>
               </div>
             </div>
@@ -389,8 +405,12 @@ export function ProfilePage() {
                     <Users className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-extrabold text-foreground tracking-tight">Personal Information</h3>
-                    <p className="text-muted-foreground font-medium text-sm mt-0.5">Manage your private details</p>
+                    <h3 className="text-2xl font-extrabold text-foreground tracking-tight">
+                      Personal Information
+                    </h3>
+                    <p className="text-muted-foreground font-medium text-sm mt-0.5">
+                      Manage your private details
+                    </p>
                   </div>
                 </div>
 
