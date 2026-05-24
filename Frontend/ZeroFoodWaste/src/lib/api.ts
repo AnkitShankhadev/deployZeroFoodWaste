@@ -161,6 +161,20 @@ export const api = {
       `/donations/${id}`,
     ),
 
+  updateDonation: (id: string, data: any) =>
+    apiRequest<{ success: boolean; data: { donation: any } }>(
+      `/donations/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      },
+    ),
+
+  deleteDonation: (id: string) =>
+    apiRequest<{ success: boolean; message: string }>(`/donations/${id}`, {
+      method: "DELETE",
+    }),
+
   getUsers: (params?: { role?: string; status?: string }) => {
     const query = new URLSearchParams();
     if (params?.role) query.append("role", params.role);

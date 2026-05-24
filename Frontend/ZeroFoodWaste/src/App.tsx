@@ -7,6 +7,7 @@ import Auth from "./pages/Auth";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import DonationsPage from "./pages/DonationsPage";
 import { CreateDonationPage } from "./pages/CreateDonationPage";
+import { EditDonationPage } from "./pages/EditDonationPage";
 import { DonationDetailPage } from "./pages/DonationDetailPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import MapPage from "./pages/MapPage";
@@ -35,6 +36,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateDonationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/donations/:id/edit"
+            element={
+              <ProtectedRoute>
+                <EditDonationPage />
               </ProtectedRoute>
             }
           />

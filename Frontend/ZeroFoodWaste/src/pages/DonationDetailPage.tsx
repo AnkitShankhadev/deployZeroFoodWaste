@@ -23,6 +23,8 @@ import {
   Loader2,
   Check,
   AlertCircle,
+  Edit2,
+  Trash2,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
@@ -95,7 +97,36 @@ export function DonationDetailPage() {
   const [donation, setDonation] = useState<Donation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAccepting, setIsAccepting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleDeleteDonation = async () => {
+    if (!donation) return;
+    if (!window.confirm("Are you sure you want to delete this donation?"))
+      return;
+
+    try {
+      setIsDeleting(true);
+      const response = await api.deleteDonation(donation._id);
+
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: "Donation deleted successfully.",
+        });
+        navigate("/donations");
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description:
+          err instanceof Error ? err.message : "Failed to delete donation.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDonation = async () => {
@@ -424,6 +455,39 @@ export function DonationDetailPage() {
                 </Button>
               </motion.div>
             )}
+
+            {/* Donor Actions - Only for owner and when donation is CREATED */}
+            {user?.id === donation.donorId?._id &&
+              donation.status === "CREATED" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex gap-4"
+                >
+                  <Button
+                    onClick={() => navigate(`/donations/${donation._id}/edit`)}
+                    className="flex-1 gap-2 h-12 text-base"
+                    variant="outline"
+                  >
+                    <Edit2 className="w-5 h-5" />
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={handleDeleteDonation}
+                    disabled={isDeleting}
+                    variant="destructive"
+                    className="flex-1 gap-2 h-12 text-base"
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-5 h-5" />
+                    )}
+                    Delete
+                  </Button>
+                </motion.div>
+              )}
 
             {/* Status Info */}
             <motion.div
