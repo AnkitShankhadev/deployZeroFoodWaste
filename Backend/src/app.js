@@ -64,6 +64,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "ZeroFoodWaste API is running 🚀" });
+});
+
 // Health check route
 app.get("/health", (req, res) => {
   res.status(200).json({
