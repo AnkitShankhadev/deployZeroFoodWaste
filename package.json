@@ -1,0 +1,8 @@
+{
+  "name": "zero-food-waste",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node Backend/src/server.js",
+    "install-deps": "cd Backend && npm install"
+  }
+}
