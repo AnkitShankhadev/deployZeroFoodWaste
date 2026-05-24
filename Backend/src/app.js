@@ -32,7 +32,7 @@ const corsOptions = {
       "http://localhost:5173",
       "http://localhost:3000",
       "http://127.0.0.1:5173",
-      "https://deploy-zero-food-waste-k9r7-bgsugf5ux-ankitshankhadevs-projects.vercel.app/",
+      "https://deploy-zero-food-waste-k9r7-bgsugf5ux-ankitshankhadevs-projects.vercel.app",
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1 || NODE_ENV === "development") {
